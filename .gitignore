@@ -29,6 +29,10 @@ __pycache__/
 # Node
 node_modules/
 
+# IDE / editors
+.idea/
+.vscode/
+
 # Local secrets
 .env
 .env.local
