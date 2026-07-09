@@ -1,12 +1,12 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "agricidaniel-claude-obsidian",
+  "name": "techtripai-claude-obsidian",
   "owner": {
-    "name": "AgriciDaniel",
-    "url": "https://github.com/AgriciDaniel"
+    "name": "TechTripAi",
+    "url": "https://github.com/TechTripAi"
   },
   "metadata": {
-    "description": "claude-obsidian: a self-organizing AI second brain for Obsidian + Claude Code by AgriciDaniel. A persistent, compounding wiki vault of plain Markdown you own, based on Karpathy's LLM Wiki pattern.",
+    "description": "Patched fork (maintained by TechTripAi) of AgriciDaniel's MIT-licensed claude-obsidian — a self-organizing AI second brain for Obsidian + Claude Code, based on Karpathy's LLM Wiki pattern. Carries bug fixes ahead of upstream; original by AgriciDaniel (https://github.com/AgriciDaniel/claude-obsidian).",
     "version": "1.9.2"
   },
   "plugins": [
