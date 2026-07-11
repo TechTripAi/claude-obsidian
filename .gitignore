@@ -136,3 +136,9 @@ _attachments/
 # v1.8 methodology mode (host-specific by default; `git add -f` to commit if desired)
 .vault-meta/mode.json
 .vault-meta/mode.*.tmp
+
+# Host-specific escape hatch: opts a checkout out of vault hooks (SessionStart/PostToolUse/Stop)
+.vault-meta/auto-commit.disabled
+
+# Ad-hoc lint-check output (regenerable; not the tracked historical tiling-report snapshots)
+wiki/meta/lint-report-*.md
