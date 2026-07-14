@@ -459,7 +459,7 @@ claude-obsidian/
 ├── .claude-plugin/
 │   ├── plugin.json              # manifest
 │   └── marketplace.json         # distribution
-├── skills/                       # 16 Claude Code skills (v1.9.2)
+├── skills/                       # 17 Claude Code skills (v1.9.2)
 │   ├── wiki/                    # orchestrator + references
 │   ├── wiki-ingest/             # source ingestion
 │   ├── wiki-query/              # answer questions from the vault
@@ -469,6 +469,7 @@ claude-obsidian/
 │   ├── wiki-mode/               # methodology modes router (v1.8+)
 │   ├── wiki-fold/               # log rollup (DragonScale opt-in)
 │   ├── wiki-delete/             # safe page deletion with reconciliation
+│   ├── wiki-archive/            # cold storage: pages, raw sources, cold vault
 │   ├── save/                    # /save: file conversations to wiki
 │   ├── autoresearch/            # autonomous research loop
 │   ├── canvas/                  # visual layer (images, PDFs, notes)

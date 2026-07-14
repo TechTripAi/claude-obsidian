@@ -158,7 +158,8 @@ Created: YYYY-MM-DD
 - Ingest: drop source in .raw/, say "ingest [filename]"
 - Query: ask any question: Claude reads index first, then drills in
 - Lint: say "lint the wiki" to run a health check
-- Archive: move cold sources to .archive/ to keep .raw/ clean
+- Archive: say "archive [page or source]" — wiki-archive moves cold pages to wiki/archives/ and cold sources to .archive/ with their bookkeeping reconciled
+- Delete: say "delete [page]" — wiki-delete shows the blast radius first, then removes with full reconciliation
 ```
 
 ---
