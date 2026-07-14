@@ -32,7 +32,7 @@ Work through these in order:
 
 1. **Orphan pages**. Wiki pages with no inbound wikilinks. They exist but nothing points to them.
 2. **Dead links**. Wikilinks that reference a page that does not exist.
-3. **Stale claims**. Assertions on older pages that newer sources have contradicted or updated.
+3. **Stale claims**. Assertions on older pages that newer sources have contradicted or updated. Also surface **age-based staleness**: pages whose `updated:` date is older than the staleness threshold. See the **Staleness Aging** section below.
 4. **Missing pages**. Concepts or entities mentioned in multiple pages but lacking their own page.
 5. **Missing cross-references**. Entities mentioned in a page but not linked.
 6. **Frontmatter gaps**. Pages missing required fields (type, status, created, updated, tags).
@@ -80,6 +80,12 @@ status: developing
 
 ## Stale Claims
 - [[Page Name]]: claim "X" may conflict with newer source [[Newer Source]].
+
+## Aging Pages
+Threshold: 90 days. Evergreen pages exempt.
+- **seed** (2): [[Page A]] (updated 2026-01-03), [[Page B]] (updated 2026-02-11)
+- **developing** (1): [[Page C]] (updated 2026-03-20)
+- **mature** (0): —
 
 ## Cross-Reference Gaps
 - [[Entity Name]] mentioned in [[Page A]] without a wikilink.
@@ -195,6 +201,21 @@ Posture:
 - Manifest entry for a missing file: **warning** (delta-tracking self-heals — a missing file simply can't be re-ingested — but the record is stale).
 - A raw file that was *archived* (moved under `.archive/`): if the pointer still names the old `.raw/` path, report it as an error with the hint "file found under `.archive/` — update `raw_file:` to the new path." Search `.archive/` by basename before declaring a file fully gone.
 - Pages with no provenance fields at all: not flagged by this check (that is a frontmatter-gap concern, and only for `type: source` pages).
+
+---
+
+## Staleness Aging
+
+The stale-claims check (#3) relies on judgment — noticing that a newer source contradicts an older page. This companion signal is mechanical: **a page nobody has touched in a long time may be quietly rotting**, whether or not anything contradicts it yet. **Report-only.**
+
+- **Threshold**: 90 days by default. If `.vault-meta/lint-thresholds.json` exists and has a `staleness_days` key, use that instead. The user can also override it for a single run ("lint with staleness at 30 days").
+- **Scope**: every page with an `updated:` frontmatter date, EXCEPT:
+  - `status: evergreen` pages — "unlikely to need updates" is their contract; age is not a signal there.
+  - Meta/fold/index pages (same exclusion set as semantic tiling scope).
+- **Output**: group offenders by `status:` (seed first — a *seed* page that is also old is the strongest rot signal), each with its `updated:` date, under an **Aging Pages** section in the lint report.
+- **Refresh path** (suggest, never perform): re-ingest a newer source that touches the page, or edit the page and bump `updated:`. If the page is genuinely done, promote it to `status: evergreen` so it leaves this report. If it is genuinely dead, archive or delete it.
+
+Aging is informational, never an error: an old page may be perfectly correct. The point is to put a floor under "out of sight, out of mind."
 
 ---
 
