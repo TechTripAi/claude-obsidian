@@ -2,6 +2,45 @@
 
 All notable changes to claude-obsidian. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [1.9.3] - 2026-07-14 (maintenance suite: provenance, staleness, delete, retract, archive)
+
+Closes the vault's missing maintenance story. The runtime could detect rot
+(lint) but had no reconciling workflows: no safe page-delete, no `.raw`
+provenance integrity, no retraction, and archiving was a one-line aspiration.
+All five changes are candidate upstream PRs (fork posture: track upstream,
+propose fixes) and are convention/skill-level — no new scripts, no schema
+breaks, everything report-first and confirm-gated.
+
+### Added
+- **wiki-delete skill** — safe page deletion: stdout-only impact report
+  (backlinks, index bullet + counter, manifest records), per-reference
+  decisions (rewrite/remove/leave), then a locked, ordered reconciliation
+  with a forward-logged `delete` entry. Refuses spine files and folds;
+  never touches `.raw/` or `hot.md`.
+- **wiki-archive skill** — cold storage in three tiers: pages →
+  `wiki/archives/<year>/` (backlinks survive; `status: archived`; index
+  bullet relocates; `address_map` re-keyed), ingested raw sources →
+  `.archive/` (`raw_file:` pointer + manifest key follow the file), and a
+  documented passive-second-vault procedure (printed only, never driven;
+  no Local REST API there — the live vault's MCP owns port 27124).
+- **wiki-lint check #9: Orphaned Provenance** — validates `raw_file:`
+  scalars, `[[.raw/...]]` `sources:` entries, and `.raw/.manifest.json`
+  keys against disk; `.archive/` basename hint for moved-not-deleted files.
+- **wiki-lint Staleness Aging** — mechanical companion to the judgment-based
+  stale-claims check: pages whose `updated:` exceeds 90 days (overridable
+  via `.vault-meta/lint-thresholds.json` `staleness_days`), grouped by
+  status, seed first; `evergreen`/`archived`/`retracted` exempt.
+- **Source retraction flow** (wiki-ingest) — `status: retracted` +
+  `confidence: low` + dated banner callout on the source page, offered
+  `[!stale]` callouts on citing pages' dependent claims (per-page, never
+  mass-applied), forward log entry. Page and raw file always survive.
+- **Frontmatter statuses `archived` and `retracted`** documented in the
+  schema reference.
+
+### Changed
+- wiki-query deep mode never cites `status: retracted` sources.
+- wiki skill Operations block routes archive/delete to the new skills.
+
 ## [1.9.2] - 2026-05-27 (prompt-cache hardening + path-handling robustness)
 
 Ports Anthropic prompt-caching best practices into the **one** place the plugin calls the Anthropic API directly: tier-1 contextual-prefix generation in `scripts/contextual-prefix.py`. Verified by full-repo sweep that `cache_control` and the Anthropic API surface exist nowhere else (incl. `claude-canvas/`). No change to retrieval output — API payload shape + observability only.
