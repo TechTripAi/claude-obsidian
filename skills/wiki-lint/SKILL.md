@@ -2,7 +2,8 @@
 name: wiki-lint
 description: >
   Health check the Obsidian wiki vault. Finds orphan pages, dead wikilinks, stale claims,
-  missing cross-references, frontmatter gaps, and empty sections. Creates or updates
+  missing cross-references, frontmatter gaps, empty sections, and orphaned .raw
+  provenance (source pages whose raw file was deleted or moved). Creates or updates
   Dataview dashboards. Generates canvas maps. Triggers on: "lint", "health check",
   "clean up wiki", "check the wiki", "wiki maintenance", "find orphans", "wiki audit".
 ---
@@ -37,8 +38,9 @@ Work through these in order:
 6. **Frontmatter gaps**. Pages missing required fields (type, status, created, updated, tags).
 7. **Empty sections**. Headings with no content underneath.
 8. **Stale index entries**. Items in `wiki/index.md` pointing to renamed or deleted pages.
-9. **Address validity** (DragonScale Mechanism 2). For every page that has an `address:` frontmatter field, validate the format. See the **Address Validation** section below.
-10. **Semantic tiling** (DragonScale Mechanism 3, opt-in). Flag candidate duplicate pages (across all scanned types, not just concepts) via embedding cosine similarity. See the **Semantic Tiling** section below.
+9. **Orphaned provenance**. Source pages whose `.raw/` provenance pointer targets a file that no longer exists, and manifest entries for vanished raw files. See the **Provenance Integrity** section below.
+10. **Address validity** (DragonScale Mechanism 2). For every page that has an `address:` frontmatter field, validate the format. See the **Address Validation** section below.
+11. **Semantic tiling** (DragonScale Mechanism 3, opt-in). Flag candidate duplicate pages (across all scanned types, not just concepts) via embedding cosine similarity. See the **Semantic Tiling** section below.
 
 ---
 
@@ -81,6 +83,10 @@ status: developing
 
 ## Cross-Reference Gaps
 - [[Entity Name]] mentioned in [[Page A]] without a wikilink.
+
+## Orphaned Provenance
+- [[Source Page]]: `raw_file:` points to `.raw/articles/foo.md`, which does not exist. Suggest: restore the file, update the path (was it archived?), or acknowledge the provenance loss.
+- `.raw/.manifest.json`: entry for `.raw/videos/bar.vtt` but the file is gone.
 ```
 
 ---
@@ -167,6 +173,28 @@ Create or update `wiki/meta/overview.canvas` for a visual domain map:
 ```
 
 Add one node per domain page. Connect domains that have significant cross-references. Colors map to the CSS scheme: 1=blue, 2=purple, 3=yellow, 4=orange, 5=green, 6=red.
+
+---
+
+## Provenance Integrity
+
+Wiki pages built from ingested sources carry a pointer back to the raw file under `.raw/`. Deleting or moving a raw file by hand silently strands that pointer — nothing else detects it, because `.raw/` paths are not ordinary wikilinks and the dead-link check does not cover them. This check makes the rot visible. **Report-only**: never delete, move, or rewrite anything here.
+
+Two provenance formats exist in the wild; check **both** on every page under `wiki/sources/` (and any other page whose frontmatter carries either field):
+
+1. **`raw_file:` scalar** — `raw_file: ".raw/articles/foo.md"`. Resolve the path relative to the vault root and confirm the file exists.
+2. **`sources:` wikilinks** — entries of the form `"[[.raw/articles/foo.md]]"` in the `sources:` list. Extract the path from inside the wikilink and confirm the file exists. (Non-`.raw/` entries in `sources:` are ordinary page references — leave them to the dead-link check.)
+
+Then validate the manifest side:
+
+3. **`.raw/.manifest.json` `sources` map** — for every key (a raw-file path), confirm the file exists on disk. A missing file means the source was deleted or moved after ingestion; the manifest entry is orphaned. Do NOT edit the manifest during lint (its header says wiki-ingest maintains it) — just report.
+
+Posture:
+
+- Page provenance pointer targets a missing file: **error** (the page's audit trail is broken).
+- Manifest entry for a missing file: **warning** (delta-tracking self-heals — a missing file simply can't be re-ingested — but the record is stale).
+- A raw file that was *archived* (moved under `.archive/`): if the pointer still names the old `.raw/` path, report it as an error with the hint "file found under `.archive/` — update `raw_file:` to the new path." Search `.archive/` by basename before declaring a file fully gone.
+- Pages with no provenance fields at all: not flagged by this check (that is a frontmatter-gap concern, and only for `type: source` pages).
 
 ---
 
