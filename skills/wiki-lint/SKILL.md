@@ -211,6 +211,7 @@ The stale-claims check (#3) relies on judgment — noticing that a newer source 
 - **Threshold**: 90 days by default. If `.vault-meta/lint-thresholds.json` exists and has a `staleness_days` key, use that instead. The user can also override it for a single run ("lint with staleness at 30 days").
 - **Scope**: every page with an `updated:` frontmatter date, EXCEPT:
   - `status: evergreen` pages — "unlikely to need updates" is their contract; age is not a signal there.
+  - `status: archived` and `status: retracted` pages — already retired from the live graph; age is expected.
   - Meta/fold/index pages (same exclusion set as semantic tiling scope).
 - **Output**: group offenders by `status:` (seed first — a *seed* page that is also old is the strongest rot signal), each with its `updated:` date, under an **Aging Pages** section in the lint report.
 - **Refresh path** (suggest, never perform): re-ingest a newer source that touches the page, or edit the page and bump `updated:`. If the page is genuinely done, promote it to `status: evergreen` so it leaves this report. If it is genuinely dead, archive or delete it.

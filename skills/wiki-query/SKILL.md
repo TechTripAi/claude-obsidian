@@ -84,7 +84,7 @@ Use for synthesis questions, comparisons, or "tell me everything about X."
 2. Identify all relevant sections (concepts, entities, sources, comparisons).
 3. Read every relevant page. No skipping.
 4. If wiki coverage is thin, offer to supplement with web search.
-5. Synthesize a comprehensive answer with full citations.
+5. Synthesize a comprehensive answer with full citations. Never cite a source page whose `status:` is `retracted` — if a claim only has retracted support, say so instead of citing it.
 6. Always file the result back as a wiki page. Deep answers are too valuable to lose.
 
 ---

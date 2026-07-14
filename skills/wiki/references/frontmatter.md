@@ -30,6 +30,8 @@ sources:
 - `developing`: has real content, not yet complete
 - `mature`: comprehensive, well-linked
 - `evergreen`: unlikely to need updates
+- `archived`: retired from the live graph (moved under the archives folder); kept for the record, excluded from staleness aging
+- `retracted`: **source pages only** — the source proved unreliable and its claims should not be trusted; see the Retracting a Source flow in `skills/wiki-ingest/SKILL.md`
 
 ---
 

@@ -239,6 +239,25 @@ On the new source summary, reference it:
 
 Do not silently overwrite old claims. Flag and let the user decide.
 
+### Retracting a source
+
+Contradiction flags conflict between two sources; **retraction** is the stronger call — the user has decided a source is bad (discredited, superseded, plain wrong) and its claims should no longer be trusted. Retraction is convention, not deletion: the source page and its raw file stay (the record of what was fed in is part of the audit trail); its *authority* is revoked. Only run this when the user explicitly asks to retract/discredit a source.
+
+1. **Mark the source page.** Set `status: retracted` and `confidence: low` in frontmatter, bump `updated:`, and add a banner callout at the very top of the body:
+   ```markdown
+   > [!contradiction] RETRACTED (YYYY-MM-DD)
+   > <one-line reason the user gave — superseded by [[Better Source]], factual errors, etc.>
+   > Claims below are kept for the record but should not be cited.
+   ```
+2. **Walk the citing pages.** Find every page that links to the source (backlinks) or lists it in `sources:`. For each claim that leans on it, offer to add:
+   ```markdown
+   > [!stale] Supporting source retracted (YYYY-MM-DD)
+   > This claim relied on [[Retracted Source]]. Re-verify or re-source it.
+   ```
+   Offer, don't mass-apply — the user decides per page (some claims have other supporting sources and need nothing).
+3. **Log it.** Prepend a `retract` entry to `wiki/log.md` naming the source, the reason, and how many citing pages were flagged.
+4. **Leave everything else alone.** The raw file is immutable; the manifest keeps its record; `hot.md` self-corrects on the next overwrite. wiki-query should treat `status: retracted` sources as non-citable.
+
 ---
 
 ## What Not to Do
