@@ -2,6 +2,20 @@
 
 All notable changes to claude-obsidian. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+- **obsidian-markdown: stop teaching `\|` as wikilink syntax.** The wikilink and
+  embed reference tables escaped their pipes (`[[Note Name\|Display Text]]`,
+  `![[image.png\|300]]`) because a raw `|` would end the Markdown table cell.
+  Agents read those rows as canonical grammar and reproduced the backslash in
+  prose, YAML, and callouts, producing links like `[[decisions#D7\|D7]]` that
+  break in strict renderers — a recurring wiki-lint defect. Both tables are now
+  code blocks, so the aliased forms appear verbatim, plus an explicit rule
+  against emitting `\|` in a wikilink (`skills/obsidian-markdown/SKILL.md`) and
+  a one-line restatement for ingestion agents that never read that skill
+  (`skills/wiki-ingest/SKILL.md`).
+
 ## [1.9.3] - 2026-07-14 (maintenance suite: provenance, staleness, delete, retract, archive)
 
 Closes the vault's missing maintenance story. The runtime could detect rot

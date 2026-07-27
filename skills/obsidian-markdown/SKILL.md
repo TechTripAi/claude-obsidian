@@ -16,14 +16,29 @@ Reference this skill when writing any wiki page. Obsidian extends standard Markd
 
 Internal links use double brackets. The filename without extension.
 
-| Syntax | What it does |
-|---|---|
-| `[[Note Name]]` | Basic link |
-| `[[Note Name\|Display Text]]` | Aliased link (shows "Display Text") |
-| `[[Note Name#Heading]]` | Link to a specific heading |
-| `[[Note Name#^block-id]]` | Link to a specific block |
+```
+[[Note Name]]                   Basic link
+[[Note Name|Display Text]]      Aliased link (shows "Display Text")
+[[Note Name#Heading]]           Link to a specific heading
+[[Note Name#^block-id]]         Link to a specific block
+```
+
+> [!warning] Never escape the pipe
+> The `|` in an aliased wikilink is **never** escaped. Obsidian parses
+> `[[Name|Alias]]` verbatim. The backslash form `[[Name\|Alias]]` is a leaked
+> artifact of Markdown *table-cell* escaping — a raw `|` would end the cell, so
+> table examples have to escape it. That escape is table-locality only. It is
+> not part of wikilink grammar, it survives in source, and it produces broken
+> links in strict renderers.
+>
+> There is no way to put a raw `|` in a table cell — per the GFM spec the pipe
+> splits the cell even inside inline code or an HTML `<code>` span, so a table
+> *must* escape it. That is exactly why wikilink examples do not belong in
+> tables: use a code block or prose, where the canonical form survives intact.
+> Never carry the backslash back out into prose, YAML, or callouts.
 
 Rules:
+- **Never emit `\|` inside a wikilink.** Obsidian's `[[A|B]]` grammar uses a raw pipe.
 - Case-sensitive on some systems. Match the exact filename.
 - No path needed: Obsidian resolves by filename uniqueness.
 - If two files have the same name, use `[[Folder/Note Name]]` to disambiguate.
@@ -34,14 +49,17 @@ Rules:
 
 Embeds use `!` before the wikilink. They display the content inline.
 
-| Syntax | What it does |
-|---|---|
-| `![[Note Name]]` | Embed a full note |
-| `![[Note Name#Heading]]` | Embed a section |
-| `![[image.png]]` | Embed an image |
-| `![[image.png\|300]]` | Embed image with width 300px |
-| `![[document.pdf]]` | Embed a PDF (Obsidian renders natively) |
-| `![[audio.mp3]]` | Embed audio |
+```
+![[Note Name]]                  Embed a full note
+![[Note Name#Heading]]          Embed a section
+![[image.png]]                  Embed an image
+![[image.png|300]]              Embed image with width 300px
+![[document.pdf]]               Embed a PDF (Obsidian renders natively)
+![[audio.mp3]]                  Embed audio
+```
+
+The width pipe follows the same rule as the alias pipe: `![[image.png|300]]`,
+never `![[image.png\|300]]`.
 
 ---
 
@@ -225,6 +243,7 @@ This sentence has a footnote.[^1]
 ## What NOT to Do
 
 - Do not use `[link text](path/to/note.md)` for internal links: use `[[Note Name]]` instead.
+- Do not escape the pipe in a wikilink or embed (`[[Note\|Alias]]`, `![[img.png\|300]]`): the backslash is Markdown table-cell escaping, not Obsidian syntax. Write `[[Note|Alias]]` and `![[img.png|300]]`.
 - Do not use HTML inside callouts: stick to Markdown.
 - Do not use `##` inside a callout body: headings don't render inside callouts.
 - Do not write `tags: [a, b, c]` inline in frontmatter: Obsidian prefers the list format.
