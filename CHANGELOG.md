@@ -2,7 +2,7 @@
 
 All notable changes to claude-obsidian. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
-## [Unreleased]
+## [1.9.4] - 2026-07-27 (wikilink pipe-escape fix)
 
 ### Fixed
 - **obsidian-markdown: stop teaching `\|` as wikilink syntax.** The wikilink and
