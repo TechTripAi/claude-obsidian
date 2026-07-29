@@ -1,26 +1,34 @@
 # claude-obsidian Hooks
 
-Plugin hooks for the claude-obsidian wiki vault. All hooks are defined in `hooks.json`.
+Plugin hooks are machine-global, so all command handlers dispatch through the
+trusted `${CLAUDE_PLUGIN_ROOT}/scripts/vault-hook.sh` script. The dispatcher
+resolves `${CLAUDE_PROJECT_DIR}`, verifies a canonical vault marker (or the
+strict pre-1.9.5 scaffold signature), and never executes project-controlled
+scripts.
 
-## Events
+| Event | Purpose |
+|---|---|
+| `SessionStart` | Emit `wiki/hot.md` and clear stale locks through the bundled `wiki-lock.sh`. |
+| `PostCompact` | Re-emit the hot cache; a signature-aware prompt remains as fallback for Claude Code versions that drop plugin-hook stdout. |
+| `PostToolUse` | Auto-commit only `wiki/`, `.raw/`, and `.vault-meta/`, unless the kill switch exists or a lock is active. |
+| `Stop` | Emit the factual hot-cache refresh reminder when wiki files remain changed. |
 
-| Event | Type | Purpose |
-|---|---|---|
-| `SessionStart` | command + prompt | Loads `wiki/hot.md` into context. Command type runs `[ -f wiki/hot.md ] && cat wiki/hot.md` as the canonical safety check (works for non-vault sessions without erroring). Prompt type complements with semantic context restoration. Matcher: `startup\|resume`. |
-| `PostCompact` | prompt | Re-loads `wiki/hot.md` after context compaction. Hook-injected context does NOT survive compaction (only `CLAUDE.md` does), so this hook restores the hot cache mid-session. |
-| `PostToolUse` | command | Auto-commits any wiki/ or .raw/ changes after Write or Edit tool calls. Guarded by `[ -d .git ]` so it never errors in non-git directories, and by `git diff --cached --quiet` so it never creates empty commits. |
-| `Stop` | prompt | Updates `wiki/hot.md` at the end of every Claude response with a brief summary of what changed. |
+## Vault signature
 
-## Known Issue: Plugin Hooks STDOUT Bug
+`bin/setup-vault.sh` idempotently creates:
 
-`anthropics/claude-code#10875` documents that **plugin hook STDOUT may not be captured** by Claude Code, while identical inline hooks in `settings.json` work correctly.
+```json
+{"schema": 1, "kind": "claude-obsidian-vault"}
+```
 
-**Impact**: If this bug is active in your Claude Code version, the prompt-type SessionStart and PostCompact hooks may not inject context as expected.
+at `.vault-meta/claude-obsidian-vault.json`. Existing vaults remain active via
+a strict signature requiring `.obsidian/`, `.raw/`, `_templates/`, and all
+three spine files `wiki/index.md`, `wiki/log.md`, and `wiki/hot.md`.
 
-**Workaround**: The command-type SessionStart hook (`cat wiki/hot.md`) is the canonical safety check. It relies on STDOUT capture for context injection, so test against this issue if hot cache restoration fails. As a fallback, copy the hook config from `hooks.json` into your user-level `~/.claude/settings.json` instead of relying on plugin hooks.
+## Hook stdout compatibility
 
-**Test for the bug**: After installing the plugin, open a fresh Claude Code session in a directory containing a populated `wiki/hot.md`. Ask Claude "what's in the hot cache?". If Claude has no idea, the STDOUT bug is active in your version.
+`anthropics/claude-code#10875` documents versions where plugin-hook stdout may
+not reach context. PostCompact therefore retains a prompt fallback, but it is
+instructed to read `wiki/hot.md` only after the same vault-signature check.
 
-## Non-Vault Sessions
-
-The SessionStart command hook uses `[ -f wiki/hot.md ] && cat wiki/hot.md || true` so it always exits 0, even when no vault is present. This makes the plugin safe to install globally without breaking non-vault Claude Code sessions.
+Run `bash tests/test_vault_hook.sh` to verify confinement and compatibility.

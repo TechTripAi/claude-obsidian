@@ -40,6 +40,11 @@ claude-obsidian assumes a **single-tenant** deployment: one user, one vault, one
 
 - **`scripts/wiki-lock.sh release`** unconditionally removes a lock file regardless of which process acquired it. This is intentional — acquire and release typically come from separate bash invocations of the same skill on the same host, so a PID-bound release would fail in normal use. In a shared-host or multi-user setup, any user able to write to `.vault-meta/locks/` could release another user's in-flight lock. Mitigation in that scenario: restrict filesystem permissions on `.vault-meta/locks/` to the vault owner.
 - **The PostToolUse auto-commit hook** (`hooks/hooks.json`) runs as the user invoking Claude Code. It auto-commits `wiki/`, `.raw/`, and `.vault-meta/` paths to the local repo on every Write/Edit. Set `.vault-meta/auto-commit.disabled` (any contents) to opt out per-vault. For shared repos, prefer disabling the hook entirely or using a more restrictive commit policy.
+- **Plugin hooks are machine-global but source-confined.** Since v1.9.5 every
+  command hook executes the bundled `${CLAUDE_PLUGIN_ROOT}/scripts/vault-hook.sh`
+  dispatcher and requires a recognized vault signature. Project-controlled
+  scripts are never executed by the hook. Pre-1.9.5 vaults use a strict legacy
+  scaffold signature until `bin/setup-vault.sh` seeds the canonical marker.
 - **Cross-process resource access** (lockfiles, transport snapshots, embed cache) is governed by filesystem permissions, not by application-layer identity checks. Standard Linux/macOS file permissions are the trust boundary.
 
 If you are deploying in a setting where any of these assumptions fail, reach out via the security contact above before adoption.

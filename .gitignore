@@ -142,3 +142,6 @@ _attachments/
 
 # Ad-hoc lint-check output (regenerable; not the tracked historical tiling-report snapshots)
 wiki/meta/lint-report-*.md
+
+# Local PR handoff for the maintained-fork hook hardening (never ship it).
+UPSTREAM-HOOK-SECURITY-PR.md

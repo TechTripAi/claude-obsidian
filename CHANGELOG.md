@@ -2,6 +2,20 @@
 
 All notable changes to claude-obsidian. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [1.9.5] - 2026-07-29 (machine-global hook confinement)
+
+### Security
+- **Plugin hooks now execute only trusted bundled code.** All command hooks
+  dispatch through `${CLAUDE_PLUGIN_ROOT}/scripts/vault-hook.sh`; an unrelated
+  repository can no longer provide a cwd-relative `scripts/wiki-lock.sh` for
+  the machine-global plugin to execute.
+- **Vault activation now has an explicit signature.** `setup-vault.sh` seeds
+  `.vault-meta/claude-obsidian-vault.json`. A strict complete-scaffold fallback
+  preserves pre-1.9.5 vaults until their next setup pass, while generic `wiki/`
+  repositories remain inert.
+- Path-scoped auto-commit, lock deferral, hot-cache restoration, the Stop
+  reminder, and `.vault-meta/auto-commit.disabled` retain their behavior.
+
 ## [1.9.4] - 2026-07-27 (wikilink pipe-escape fix)
 
 ### Fixed

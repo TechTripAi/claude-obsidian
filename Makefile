@@ -2,7 +2,7 @@
 # Test runner entry points for DragonScale and vault tooling.
 
 .PHONY: test test-address test-tiling test-boundary test-bm25 test-retrieve \
-        test-lock test-concurrent test-mode test-contextual setup-dragonscale \
+        test-lock test-hooks test-concurrent test-mode test-contextual setup-dragonscale \
         setup-retrieve setup-mode clean-test-state help
 
 help:
@@ -14,6 +14,7 @@ help:
 	@echo "  make test-bm25        scripts/bm25-index.py tests (python, hermetic)"
 	@echo "  make test-retrieve    scripts/retrieve.py + rerank.py tests (python, hermetic)"
 	@echo "  make test-lock        scripts/wiki-lock.sh tests (shell, hermetic)"
+	@echo "  make test-hooks       machine-global hook confinement tests (shell, hermetic)"
 	@echo "  make test-concurrent  multi-writer correctness gate (shell, hermetic)"
 	@echo "  make test-mode        scripts/wiki-mode.py tests (python, hermetic)"
 	@echo "  make test-contextual  scripts/contextual-prefix.py cache-floor tests (python, hermetic)"
@@ -22,7 +23,7 @@ help:
 	@echo "  make setup-mode       Run bin/setup-mode.sh to pick a methodology mode (opt-in v1.8)"
 	@echo "  make clean-test-state Remove runtime lockfiles and tiling/embed caches"
 
-test: test-address test-tiling test-boundary test-bm25 test-retrieve test-lock test-concurrent test-mode test-contextual
+test: test-address test-tiling test-boundary test-bm25 test-retrieve test-lock test-hooks test-concurrent test-mode test-contextual
 	@echo ""
 	@echo "All tests passed."
 
@@ -49,6 +50,10 @@ test-retrieve:
 test-lock:
 	@echo "=== test_wiki_lock.sh ==="
 	@bash tests/test_wiki_lock.sh
+
+test-hooks:
+	@echo "=== test_vault_hook.sh ==="
+	@bash tests/test_vault_hook.sh
 
 test-concurrent:
 	@echo "=== test_concurrent_write.sh ==="

@@ -17,6 +17,20 @@ mkdir -p "$OBSIDIAN/snippets"
 mkdir -p "$VAULT/.raw"
 mkdir -p "$VAULT/wiki/concepts" "$VAULT/wiki/entities" "$VAULT/wiki/sources" "$VAULT/wiki/meta"
 mkdir -p "$VAULT/_templates"
+mkdir -p "$VAULT/.vault-meta"
+
+# Machine-global plugin hooks must distinguish a real vault from an unrelated
+# repository that happens to contain wiki/. Seed a stable, content-free marker;
+# never overwrite a future schema or user-edited file.
+VAULT_MARKER="$VAULT/.vault-meta/claude-obsidian-vault.json"
+if [ ! -e "$VAULT_MARKER" ]; then
+  cat > "$VAULT_MARKER" <<'EOF'
+{
+  "schema": 1,
+  "kind": "claude-obsidian-vault"
+}
+EOF
+fi
 
 # ── 2. Write graph.json ───────────────────────────────────────────────────────
 cat > "$OBSIDIAN/graph.json" << 'EOF'
