@@ -14,11 +14,29 @@
 # Bootstrap files (AGENTS.md, GEMINI.md, .cursor/rules/, .windsurf/rules/,
 # .github/copilot-instructions.md) are already committed in the repo.
 # This script just wires up the skills directory.
+#
+# The home-directory links (~/.codex, ~/.opencode, ~/.gemini) write outside
+# this repo, so they are consent-gated: the script asks first when a terminal
+# is attached, --yes skips the question, and a non-interactive run without
+# --yes skips the links and prints the ln -s commands instead. The repo-local
+# links (.cursor/, .windsurf/) are project-owned and never prompt.
 
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SKILLS_DIR="$REPO_ROOT/skills"
+
+ASSUME_YES=false
+for arg in "$@"; do
+  case "$arg" in
+    --yes|-y) ASSUME_YES=true ;;
+    -h|--help)
+      sed -n '2,16p' "$0" | sed 's/^# \{0,1\}//'
+      exit 0
+      ;;
+    *) echo "ERR: unknown flag: $arg" >&2; exit 2 ;;
+  esac
+done
 
 if [ ! -d "$SKILLS_DIR" ]; then
   echo "ERROR: $SKILLS_DIR does not exist. Are you running this from the claude-obsidian repo?"
@@ -61,14 +79,37 @@ echo "claude-obsidian: multi-agent skill installer"
 echo "Repo: $REPO_ROOT"
 echo
 
-# Codex CLI
-link_if_missing "$SKILLS_DIR" "$HOME/.codex/skills/claude-obsidian" "Codex CLI"
+# Home-directory links write outside the repo — ask first.
+HOME_LINKS_OK=false
+if $ASSUME_YES; then
+  HOME_LINKS_OK=true
+elif [ -t 0 ]; then
+  printf "Link skills into ~/.codex, ~/.opencode, ~/.gemini? [Y/n] "
+  read -r reply
+  case "$reply" in
+    [nN]|[nN][oO]) HOME_LINKS_OK=false ;;
+    *)             HOME_LINKS_OK=true ;;
+  esac
+else
+  echo "No terminal to ask on — skipping the home-directory links."
+fi
 
-# OpenCode
-link_if_missing "$SKILLS_DIR" "$HOME/.opencode/skills/claude-obsidian" "OpenCode"
+if $HOME_LINKS_OK; then
+  # Codex CLI
+  link_if_missing "$SKILLS_DIR" "$HOME/.codex/skills/claude-obsidian" "Codex CLI"
 
-# Gemini CLI
-link_if_missing "$SKILLS_DIR" "$HOME/.gemini/skills/claude-obsidian" "Gemini CLI"
+  # OpenCode
+  link_if_missing "$SKILLS_DIR" "$HOME/.opencode/skills/claude-obsidian" "OpenCode"
+
+  # Gemini CLI
+  link_if_missing "$SKILLS_DIR" "$HOME/.gemini/skills/claude-obsidian" "Gemini CLI"
+else
+  echo "Skipped home-directory links. Create them yourself with:"
+  echo "  ln -s $SKILLS_DIR $HOME/.codex/skills/claude-obsidian"
+  echo "  ln -s $SKILLS_DIR $HOME/.opencode/skills/claude-obsidian"
+  echo "  ln -s $SKILLS_DIR $HOME/.gemini/skills/claude-obsidian"
+  echo "or re-run with --yes."
+fi
 
 # Cursor (workspace-local)
 link_if_missing "$SKILLS_DIR" "$REPO_ROOT/.cursor/skills" "Cursor"
