@@ -2,6 +2,44 @@
 
 All notable changes to claude-obsidian. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [1.9.6] - 2026-08-10 (install-consent hardening)
+
+Setup should instruct before it installs: show the exact command, ask whether
+to run it or let the user install it themselves, and never touch anything
+outside the vault without consent. All four changes are candidate upstream
+PRs (fork posture: track upstream, propose fixes); see
+`UPSTREAM-INSTALL-CONSENT-PR.md` for the proposal writeup of the two
+behavior-changing fixes.
+
+### Fixed
+- **setup-vault.sh no longer clobbers Obsidian config.** `graph.json`,
+  `app.json`, and `appearance.json` were rewritten unconditionally on every
+  run, destroying user-tuned settings on re-runs and updates. Each now gets
+  the same write-if-absent guard the vault marker uses — delete a file and
+  re-run to regenerate it.
+- **setup-retrieve.sh / setup-mode.sh: new `--vault PATH` flag.** Both
+  hard-wired `VAULT` to their own parent directory, so runs from the
+  installed plugin cache (`~/.claude/plugins/cache/...`) silently
+  provisioned the cache copy — which even passes a vault-shape check, since
+  the plugin ships a demo `wiki/`. They now accept `--vault`, refuse targets
+  inside the plugin cache, and require the target to be vault-shaped.
+
+### Added
+- **Consent gate on the Excalidraw download** (`setup-vault.sh`): the ~8MB
+  unpinned `main.js` curl now asks first when a terminal is attached
+  (`--with-excalidraw` / `--no-excalidraw` to decide up front); a
+  non-interactive run skips it and prints the manual command.
+- **Consent gate on home-directory symlinks** (`setup-multi-agent.sh`): the
+  `~/.codex`, `~/.opencode`, `~/.gemini` links ask first (`--yes` bypasses;
+  non-interactive runs skip and print the `ln -s` commands). Repo-local
+  `.cursor/` and `.windsurf/` links stay unprompted.
+
+### Changed
+- **Obsidian app install is instruct-then-offer** (`skills/wiki/references/plugins.md`,
+  `commands/wiki.md`): the agent shows the exact platform command, asks
+  run-for-me vs self-install, re-checks afterwards, and never installs
+  silently — replacing the `ls … || brew install --cask obsidian` one-liner.
+
 ## [1.9.5] - 2026-07-29 (machine-global hook confinement)
 
 ### Security
