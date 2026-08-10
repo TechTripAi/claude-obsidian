@@ -4,6 +4,20 @@
 
 ## Install Obsidian
 
+Obsidian is external software — never install it silently. When the check
+below says it is missing, follow **instruct-then-offer**:
+
+1. Show the user the exact install command for their platform (below).
+2. Ask: "Want me to run this now, or will you install it yourself?"
+   (The direct download at https://obsidian.md/download counts as
+   installing it themselves.)
+3. If they say run it — run the command, then re-run the check.
+4. If they install it themselves — wait for their word, then re-run the
+   check. If it still isn't found, say so and offer again (retry / run it
+   for them / skip).
+5. If they skip — continue, but note that vault setup eventually needs
+   Obsidian installed.
+
 ### Linux (Flatpak: recommended)
 
 Check if installed:
@@ -12,21 +26,33 @@ flatpak list 2>/dev/null | grep -i obsidian && echo "FOUND via flatpak" || \
 which obsidian 2>/dev/null && echo "FOUND in PATH" || echo "NOT FOUND"
 ```
 
-Install if not found:
+Install command (offer, don't auto-run):
 ```bash
 flatpak install flathub md.obsidian.Obsidian
 ```
 
 ### macOS
 
+Check if installed:
 ```bash
-ls /Applications/Obsidian.app 2>/dev/null && echo "FOUND" || brew install --cask obsidian
+ls /Applications/Obsidian.app 2>/dev/null && echo "FOUND" || echo "NOT FOUND"
+```
+
+Install command (offer, don't auto-run):
+```bash
+brew install --cask obsidian
 ```
 
 ### Windows
 
+Check if installed:
 ```powershell
-Test-Path "$env:LOCALAPPDATA\Obsidian" && echo "FOUND" || winget install Obsidian.Obsidian
+if (Test-Path "$env:LOCALAPPDATA\Obsidian") { echo "FOUND" } else { echo "NOT FOUND" }
+```
+
+Install command (offer, don't auto-run):
+```powershell
+winget install Obsidian.Obsidian
 ```
 
 ### All platforms: direct download

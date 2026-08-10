@@ -4,7 +4,7 @@ description: Bootstrap or check the claude-obsidian wiki vault. Reads the wiki s
 
 Read the `wiki` skill. Then run the setup workflow:
 
-1. Check if Obsidian is installed. If not, offer to install it (see `skills/wiki/references/plugins.md`).
+1. Check if Obsidian is installed. If not, follow the instruct-then-offer flow in `skills/wiki/references/plugins.md`: show the exact install command, ask whether to run it or let the user install it themselves, re-check afterwards. Never install it silently.
 2. Check if this directory has a vault (look for `.obsidian/` folder). If yes, report current vault state.
 3. Check if the MCP server is configured (`claude mcp list`). If not, ask if the user wants to set it up.
 4. Ask ONE question: "What is this vault for?"
