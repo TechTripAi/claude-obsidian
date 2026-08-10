@@ -1,13 +1,32 @@
 #!/usr/bin/env bash
 # claude-obsidian vault setup script
 # Run this ONCE before opening Obsidian for the first time.
-# Usage: bash bin/setup-vault.sh [optional: /path/to/vault]
+# Usage: bash bin/setup-vault.sh [optional: /path/to/vault] [--with-excalidraw|--no-excalidraw]
 # Default: uses the directory where this script lives (the vault root)
+#
+# Existing .obsidian/*.json config is never overwritten — delete a file and
+# re-run to regenerate it. The Excalidraw main.js download (~8MB from GitHub,
+# latest release, unpinned) is consent-gated: pass --with-excalidraw to
+# download without prompting, --no-excalidraw to skip; with neither flag the
+# script asks when a terminal is attached and skips otherwise.
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-VAULT="${1:-$(dirname "$SCRIPT_DIR")}"
+VAULT=""
+EXCALIDRAW_MODE="ask"   # ask | yes | no
+for arg in "$@"; do
+  case "$arg" in
+    --with-excalidraw) EXCALIDRAW_MODE="yes" ;;
+    --no-excalidraw)   EXCALIDRAW_MODE="no" ;;
+    -*)
+      echo "Unknown option: $arg" >&2
+      echo "Usage: bash bin/setup-vault.sh [/path/to/vault] [--with-excalidraw|--no-excalidraw]" >&2
+      exit 2 ;;
+    *)                 VAULT="$arg" ;;
+  esac
+done
+[ -n "$VAULT" ] || VAULT="$(dirname "$SCRIPT_DIR")"
 OBSIDIAN="$VAULT/.obsidian"
 
 echo "Setting up claude-obsidian vault at: $VAULT"
@@ -33,6 +52,9 @@ EOF
 fi
 
 # ── 2. Write graph.json ───────────────────────────────────────────────────────
+if [ -e "$OBSIDIAN/graph.json" ]; then
+  echo "✓ graph.json exists — left untouched (delete it and re-run to regenerate)"
+else
 cat > "$OBSIDIAN/graph.json" << 'EOF'
 {
   "collapse-filter": false,
@@ -60,8 +82,12 @@ cat > "$OBSIDIAN/graph.json" << 'EOF'
   "scale": 1.0
 }
 EOF
+fi
 
 # ── 3. Write app.json (excluded files) ───────────────────────────────────────
+if [ -e "$OBSIDIAN/app.json" ]; then
+  echo "✓ app.json exists — left untouched (delete it and re-run to regenerate)"
+else
 cat > "$OBSIDIAN/app.json" << 'EOF'
 {
   "userIgnoreFilters": [
@@ -77,8 +103,12 @@ cat > "$OBSIDIAN/app.json" << 'EOF'
   ]
 }
 EOF
+fi
 
 # ── 4. Write appearance.json (enable CSS snippets) ───────────────────────────
+if [ -e "$OBSIDIAN/appearance.json" ]; then
+  echo "✓ appearance.json exists — left untouched (delete it and re-run to regenerate)"
+else
 cat > "$OBSIDIAN/appearance.json" << 'EOF'
 {
   "enabledCssSnippets": [
@@ -88,15 +118,35 @@ cat > "$OBSIDIAN/appearance.json" << 'EOF'
   ]
 }
 EOF
+fi
 
 # ── 5. Download Excalidraw main.js (8MB, not in git) ─────────────────────────
 EXCALIDRAW="$OBSIDIAN/plugins/obsidian-excalidraw-plugin"
+EXCALIDRAW_URL="https://github.com/zsviczian/obsidian-excalidraw-plugin/releases/latest/download/main.js"
 if [ -f "$EXCALIDRAW/manifest.json" ] && [ ! -f "$EXCALIDRAW/main.js" ]; then
-  echo "Downloading Excalidraw main.js (~8MB)..."
-  curl -sS -L \
-    "https://github.com/zsviczian/obsidian-excalidraw-plugin/releases/latest/download/main.js" \
-    -o "$EXCALIDRAW/main.js"
-  echo "✓ Excalidraw main.js downloaded"
+  if [ "$EXCALIDRAW_MODE" = "ask" ]; then
+    if [ -t 0 ]; then
+      echo "Excalidraw needs its main.js (~8MB, downloaded from GitHub releases — latest, unpinned):"
+      echo "  $EXCALIDRAW_URL"
+      printf "Download it now? [y/N] "
+      read -r reply
+      case "$reply" in
+        [yY]|[yY][eE][sS]) EXCALIDRAW_MODE="yes" ;;
+        *)                 EXCALIDRAW_MODE="no" ;;
+      esac
+    else
+      EXCALIDRAW_MODE="no"
+    fi
+  fi
+  if [ "$EXCALIDRAW_MODE" = "yes" ]; then
+    echo "Downloading Excalidraw main.js (~8MB)..."
+    curl -sS -L "$EXCALIDRAW_URL" -o "$EXCALIDRAW/main.js"
+    echo "✓ Excalidraw main.js downloaded"
+  else
+    echo "Skipped Excalidraw main.js. Download it later with:"
+    echo "  curl -L $EXCALIDRAW_URL -o $EXCALIDRAW/main.js"
+    echo "or re-run this script with --with-excalidraw."
+  fi
 elif [ -f "$EXCALIDRAW/main.js" ]; then
   echo "✓ Excalidraw main.js already present"
 fi
