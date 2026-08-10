@@ -35,12 +35,16 @@
 #   bash bin/setup-retrieve.sh --no-llm     # force tier-3 synthetic-only
 #   bash bin/setup-retrieve.sh --rebuild    # rebuild all chunks
 #   bash bin/setup-retrieve.sh --check      # diagnostics only; no provisioning
+#   bash bin/setup-retrieve.sh --vault PATH # target PATH instead of this repo
+#
+# --vault matters when this script runs from the installed plugin cache
+# (~/.claude/plugins/cache/...): without it, VAULT resolves to the cache copy
+# and the pipeline would provision the cache, not your vault.
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VAULT="$(dirname "$SCRIPT_DIR")"
-META="$VAULT/.vault-meta"
 
 NO_LLM=false
 REBUILD=false
@@ -51,8 +55,13 @@ while [ $# -gt 0 ]; do
     --no-llm)   NO_LLM=true ;;
     --rebuild)  REBUILD=true ;;
     --check)    CHECK_ONLY=true ;;
+    --vault)
+      [ -n "${2:-}" ] || { echo "ERR: --vault requires a path" >&2; exit 2; }
+      VAULT="$2"
+      shift
+      ;;
     -h|--help)
-      sed -n '2,30p' "$0" | sed 's/^# \{0,1\}//'
+      sed -n '2,35p' "$0" | sed 's/^# \{0,1\}//'
       exit 0
       ;;
     *)
@@ -65,6 +74,21 @@ done
 
 say() { printf '%s\n' "$@"; }
 warn() { printf 'WARN: %s\n' "$@" >&2; }
+
+# Refuse to provision the plugin cache — the demo wiki/ it ships makes it look
+# vault-shaped, so catch the path itself; and require a real vault otherwise.
+case "$VAULT" in
+  *"/.claude/plugins/"*)
+    warn "target resolves inside the Claude plugin cache: $VAULT"
+    warn "pass --vault /path/to/your/vault to provision the real vault"
+    exit 2
+    ;;
+esac
+if [ ! -d "$VAULT/wiki" ] && [ ! -d "$VAULT/.vault-meta" ]; then
+  warn "not a claude-obsidian vault (no wiki/ or .vault-meta/): $VAULT"
+  exit 2
+fi
+META="$VAULT/.vault-meta"
 
 say "═══ wiki-retrieve setup (v1.7+) ═══"
 say "Vault: $VAULT"

@@ -11,12 +11,16 @@
 #   bash bin/setup-mode.sh --mode lyt          # non-interactive (CI / scripts)
 #   bash bin/setup-mode.sh --mode generic --no-seed
 #   bash bin/setup-mode.sh --check             # diagnostics only, no write
+#   bash bin/setup-mode.sh --vault PATH        # target PATH instead of this repo
 #
 # Flags:
 #   --mode MODE     Skip the interactive prompt; pick MODE directly.
 #                   Valid: generic | lyt | para | zettelkasten
 #   --no-seed       Skip the optional folder-seeding step
 #   --check         Print current mode + diagnostics; write nothing
+#   --vault PATH    Operate on PATH. Matters when this script runs from the
+#                   installed plugin cache (~/.claude/plugins/cache/...):
+#                   without it, VAULT resolves to the cache copy.
 #
 # Exit codes:
 #   0 — success
@@ -27,7 +31,6 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VAULT="$(dirname "$SCRIPT_DIR")"
-WM="$VAULT/scripts/wiki-mode.py"
 
 REQUESTED_MODE=""
 NO_SEED=false
@@ -38,8 +41,11 @@ while [ $# -gt 0 ]; do
     --mode)     REQUESTED_MODE="${2:-}"; shift 2 ;;
     --no-seed)  NO_SEED=true; shift ;;
     --check)    CHECK_ONLY=true; shift ;;
+    --vault)
+      [ -n "${2:-}" ] || { echo "ERR: --vault requires a path" >&2; exit 2; }
+      VAULT="$2"; shift 2 ;;
     -h|--help)
-      sed -n '2,25p' "$0" | sed 's/^# \{0,1\}//'
+      sed -n '2,30p' "$0" | sed 's/^# \{0,1\}//'
       exit 0
       ;;
     *) echo "ERR: unknown flag: $1" >&2; exit 2 ;;
@@ -48,6 +54,21 @@ done
 
 say() { printf '%s\n' "$@"; }
 warn() { printf 'WARN: %s\n' "$@" >&2; }
+
+# Refuse to operate on the plugin cache — the demo wiki/ it ships makes it
+# look vault-shaped, so catch the path itself; and require a real vault otherwise.
+case "$VAULT" in
+  *"/.claude/plugins/"*)
+    warn "target resolves inside the Claude plugin cache: $VAULT"
+    warn "pass --vault /path/to/your/vault to operate on the real vault"
+    exit 2
+    ;;
+esac
+if [ ! -d "$VAULT/wiki" ] && [ ! -d "$VAULT/.vault-meta" ]; then
+  warn "not a claude-obsidian vault (no wiki/ or .vault-meta/): $VAULT"
+  exit 2
+fi
+WM="$VAULT/scripts/wiki-mode.py"
 
 say "═══ wiki-mode setup (v1.8+) ═══"
 say "Vault: $VAULT"
