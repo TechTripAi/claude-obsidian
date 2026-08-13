@@ -188,7 +188,7 @@ MCP lets Claude read and write vault notes directly without copy-paste.
 claude mcp add-json obsidian-vault '{
   "type": "stdio",
   "command": "uvx",
-  "args": ["mcp-obsidian"],
+  "args": ["--from", "mcp-obsidian==0.2.2", "--with", "mcp<2", "mcp-obsidian"],
   "env": {
     "OBSIDIAN_API_KEY": "your-key",
     "OBSIDIAN_HOST": "127.0.0.1",
@@ -197,6 +197,11 @@ claude mcp add-json obsidian-vault '{
   }
 }' --scope user
 ```
+
+> The version pins matter: `mcp-obsidian` 0.2.2 is the tested release, and it
+> leaves its `mcp` SDK dependency unpinned — `mcp` 2.0.0 removed the API it
+> uses, so without `--with mcp<2` the server crashes on startup and Claude
+> reports `CONNECTION_CLOSED`.
 
 **Option B: Filesystem (no plugin needed)**
 
