@@ -145,3 +145,7 @@ wiki/meta/lint-report-*.md
 
 # Local PR handoff for the maintained-fork hook hardening (never ship it).
 UPSTREAM-HOOK-SECURITY-PR.md
+
+# Claude Code local state (per-user, never shared)
+.claude/settings.local.json
+.claude/*.local.json
