@@ -10,11 +10,12 @@ All notable changes to claude-obsidian. Format: [Keep a Changelog](https://keepa
   patch set tracking upstream. README gains a fork notice at the top and a catalog
   install route; ATTRIBUTION.md gains an upstream-original section retaining Daniel
   Agrici's credit and MIT license.
-- **Listed in the TechTrip-AI-plugins catalog.** Installable as
-  `claude-obsidian@TechTrip-AI-plugins` from
+- **Distributed through the TechTrip-AI-plugins catalog; standalone marketplace retired.**
+  Installable as `claude-obsidian@TechTrip-AI-plugins` from
   [TechTripAi/TechTrip-AI-plugins](https://github.com/TechTripAi/TechTrip-AI-plugins).
-  This repository's own `techtripai-claude-obsidian` marketplace remains for existing
-  installs and will be retired in a later release.
+  This repository's own `.claude-plugin/marketplace.json` (`techtripai-claude-obsidian`)
+  is removed; existing installs remove that marketplace and reinstall from the catalog,
+  or let techtrip-secondbrain 0.2.21 migrate them.
 
 ## [1.9.6] - 2026-08-10 (install-consent hardening)
 

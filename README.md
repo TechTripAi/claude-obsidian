@@ -165,8 +165,10 @@ claude plugin marketplace add TechTripAi/TechTrip-AI-plugins
 claude plugin install claude-obsidian@TechTrip-AI-plugins
 ```
 
-This repository is also its own marketplace (`techtripai-claude-obsidian`), which existing
-installs keep using; new installs should prefer the catalog.
+> Installed earlier from this repository's own `techtripai-claude-obsidian` marketplace?
+> That marketplace is retired. Run `claude plugin marketplace remove techtripai-claude-obsidian`,
+> then the two commands above. If techtrip-secondbrain manages this plugin for you, run
+> `/secondbrain` instead and it migrates the install.
 
 **Upstream original (Daniel Agrici's release, not this fork):**
 
