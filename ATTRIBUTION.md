@@ -1,5 +1,19 @@
 # Attributions
 
+## Upstream original: claude-obsidian by Daniel Agrici
+
+**Author:** Daniel Agrici (AgriciDaniel)
+**Source:** https://github.com/AgriciDaniel/claude-obsidian
+**License:** MIT (retained; see [LICENSE](LICENSE))
+**Use:** This repository, https://github.com/TechTripAi/claude-obsidian, is a fork of the
+upstream project maintained independently by TechTrip AI (Terry Trippany). It carries fixes
+and changes that are not merged upstream and has diverged from it. The upstream author's
+copyright and MIT license apply to the original work and are retained in full; TechTrip AI's
+changes are released under the same MIT license. Everything below this section is the
+upstream project's own attribution list, kept as written.
+
+---
+
 claude-obsidian is an original work. The following third-party patterns, tools, and creators informed its design.
 
 ---

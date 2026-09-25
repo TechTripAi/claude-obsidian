@@ -19,6 +19,24 @@ Claude + Obsidian knowledge companion and self-organizing AI second brain. A run
 
 Open-source Obsidian AI plugin for AI note-taking, personal knowledge management (PKM), second-brain workflows, and a private Notion alternative. **15 Claude Code skills**, multi-agent support, multi-writer safe (v1.7+), first-class methodology modes (LYT / PARA / Zettelkasten / Generic via v1.8), and the 10-principle thinking framework (v1.9). Based on [Andrej Karpathy's LLM Wiki pattern](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f).
 
+> **This is TechTrip AI's maintained fork.** The original claude-obsidian is by
+> [Daniel Agrici](https://github.com/AgriciDaniel/claude-obsidian), MIT licensed, and
+> that credit and license are retained in full (see [ATTRIBUTION.md](ATTRIBUTION.md)).
+> This fork at [TechTripAi/claude-obsidian](https://github.com/TechTripAi/claude-obsidian)
+> is maintained independently by [TechTrip AI](https://github.com/TechTripAi) and carries
+> fixes and changes that are not merged upstream, so the two have diverged and will keep
+> diverging. It is the version [techtrip-secondbrain](https://github.com/TechTripAi/techtrip-secondbrain)
+> installs. To install it on its own, use TechTrip AI's catalog:
+>
+> ```
+> claude plugin marketplace add TechTripAi/TechTrip-AI-plugins
+> claude plugin install claude-obsidian@TechTrip-AI-plugins
+> ```
+>
+> The rest of this README is the upstream project's documentation, which still applies;
+> where it names the upstream marketplace, the catalog commands above are the equivalent
+> for this fork.
+
 > **Two ways to get this skill.** Pick the one that fits how you work.
 >
 > - 🌐 **Public open-source build** (latest: `v1.9.2`, recommended): the free, MIT-licensed release on [Daniel Agrici's GitHub](https://github.com/AgriciDaniel/claude-obsidian). Open to anyone, no membership required. Ships everything: v1.7 Compound Vault, v1.8 methodology modes, and the v1.9 thinking framework plus audit hardening.
@@ -136,6 +154,21 @@ Plugin installation is a two-step process. First add the marketplace catalog, th
 >
 > - **Public (recommended, no membership):** the commands below install the free, MIT-licensed release from [`AgriciDaniel/claude-obsidian`](https://github.com/AgriciDaniel/claude-obsidian). Nothing to sign up for.
 > - **AI Marketing Hub Pro member?** For early access to in-development features, swap `AgriciDaniel/claude-obsidian` for `AI-Marketing-Hub/claude-obsidian` and the plugin slug `claude-obsidian@agricidaniel-claude-obsidian` for `claude-obsidian@ai-marketing-hub-claude-obsidian`. The org mirror requires an authenticated `gh auth login` (or GitHub PAT) with access to the `AI-Marketing-Hub` org. If `/plugin marketplace add` returns a 404, your account is not in the org yet. DM in the [Skool community](https://www.skool.com/ai-marketing-hub-pro) to get added.
+
+**This fork (TechTrip AI's maintained build):**
+
+```bash
+# Step 1: add TechTrip AI's catalog
+claude plugin marketplace add TechTripAi/TechTrip-AI-plugins
+
+# Step 2: install the plugin from it
+claude plugin install claude-obsidian@TechTrip-AI-plugins
+```
+
+This repository is also its own marketplace (`techtripai-claude-obsidian`), which existing
+installs keep using; new installs should prefer the catalog.
+
+**Upstream original (Daniel Agrici's release, not this fork):**
 
 ```bash
 # Step 1: add the marketplace

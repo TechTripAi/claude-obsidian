@@ -2,6 +2,20 @@
 
 All notable changes to claude-obsidian. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [Unreleased]
+
+### Changed
+- **Fork posture: maintained independently.** Upstream does not take this fork's
+  changes, so the fork is now a standing, independently maintained build rather than a
+  patch set tracking upstream. README gains a fork notice at the top and a catalog
+  install route; ATTRIBUTION.md gains an upstream-original section retaining Daniel
+  Agrici's credit and MIT license.
+- **Listed in the TechTrip-AI-plugins catalog.** Installable as
+  `claude-obsidian@TechTrip-AI-plugins` from
+  [TechTripAi/TechTrip-AI-plugins](https://github.com/TechTripAi/TechTrip-AI-plugins).
+  This repository's own `techtripai-claude-obsidian` marketplace remains for existing
+  installs and will be retired in a later release.
+
 ## [1.9.6] - 2026-08-10 (install-consent hardening)
 
 Setup should instruct before it installs: show the exact command, ask whether
