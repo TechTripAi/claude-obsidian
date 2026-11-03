@@ -71,7 +71,7 @@ Read WIKI.md in this project. Then:
 1. Check if Obsidian is installed. If not, install it.
 2. Check if the Local REST API plugin is running on port 27124.
 3. Configure the MCP server.
-4. Ask me ONE question: "What is this vault for?"
+4. Show me the six wiki modes side by side, then ask me ONE question: "What is this vault for?"
 Then scaffold the full wiki structure.
 ```
 
@@ -170,7 +170,7 @@ Three snippets are auto-enabled by `setup-vault.sh`:
 | **E: Research** | Papers, concepts, thesis |
 | **F: Book/Course** | Chapter tracker, course notes |
 
-Modes can be combined.
+Claude shows these side by side before asking what the vault is for. A mode is a folder set, a frontmatter schema for its main note type, and the filing rules in the vault `CLAUDE.md`; it is not an Obsidian feature and nothing enforces it beyond Claude reading those rules. Every mode keeps `sources/`, `concepts/`, `entities/`, and `questions/`, which is where ingest and autoresearch file. Modes can be combined, and a custom mode (a base mode plus the folders your outputs need, such as `writing/` for articles) is the normal outcome. Full comparison and a worked custom example: `skills/wiki/references/modes.md`.
 
 ---
 

@@ -199,7 +199,7 @@ Read WIKI.md in this project. Then:
 1. Check if Obsidian is installed. If not, install it.
 2. Check if the Local REST API plugin is running on port 27124.
 3. Configure the MCP server.
-4. Ask me ONE question: "What is this vault for?"
+4. Show me the six wiki modes side by side, then ask me ONE question: "What is this vault for?"
 Then scaffold the full wiki structure.
 ```
 
@@ -235,8 +235,8 @@ First-run setup walks through:
 
 1. Check Obsidian is installed
 2. Check Local REST API plugin (if MCP transport desired)
-3. Ask "What is this vault for?" (one question, drives the scaffold)
-4. Scaffold per chosen [Methodology Mode](#methodology-modes-v18) and [Vault Use Case](#vault-use-cases-v10)
+3. Show the six wiki modes side by side (what you feed in, the atomic unit, what you get out), then ask "What is this vault for?" (one question, drives the scaffold). A wiki mode is a folder set plus filing rules, not an Obsidian feature; modes combine, and custom modes are normal
+4. Scaffold per chosen [Methodology Mode](#methodology-modes-v18) and [Vault Use Case](#vault-use-cases-v10), always keeping `sources/`, `concepts/`, `entities/`, `questions/`
 5. Seed `hot.md`, `index.md`, `log.md`, `wiki/meta/dashboard.base`
 6. Suggest the first ingest
 
