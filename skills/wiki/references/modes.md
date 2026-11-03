@@ -1,6 +1,34 @@
 # Wiki Modes
 
-Six modes cover the most common use cases. Pick the one that fits, or combine them.
+Six modes cover the most common use cases. Pick the one that fits, combine them, or define a custom one.
+
+A wiki mode is **not an Obsidian feature**. It is a convention the `/wiki` skill writes into the vault: a folder set, a frontmatter schema for the main note type, a few hub pages, and the filing rules in the vault's `CLAUDE.md`. Nothing enforces it except Claude reading those rules at the start of every ingest. That makes the mode the one part of the vault the user is meant to shape.
+
+Two different axes share the word "mode". The **wiki modes A-F** on this page are scaffold templates: what folders exist and what the main note type tracks. The **methodology mode** from `/wiki-mode` (generic, LYT, PARA, Zettelkasten; stored in `.vault-meta/mode.json`) is a filing-style router that `wiki-ingest`, `save`, and `autoresearch` call before writing a page. A vault has one of each. This page is about the first axis.
+
+## At a glance
+
+Show this table **before** asking what the vault is for. Pick by what the raw sources will be and what question the user will ask most.
+
+| Mode | For | Atomic unit | Extra folders | Frontmatter tracks | "Done" looks like |
+|------|-----|-------------|---------------|--------------------|-------------------|
+| **A** Website / Sitemap | a site's URLs: crawls, analytics, GSC exports | one page per URL | pages, structure, audits, keywords | HTTP status, meta, indexed, canonical, link counts | no gaps, no broken redirects |
+| **B** GitHub / Repository | a codebase: README, git log, code, issues | one page per module | modules, components, decisions, dependencies, flows | path, language, depends_on, used_by | every module documented with its flows |
+| **C** Business / Project | meetings, Slack, docs, competitor intel | one page per decision | stakeholders, decisions, deliverables, intel, comms | status, priority, owner, due date | decisions logged, deliverables shipped |
+| **D** Personal / Second Brain | journals, articles, podcasts, voice memos | one page per goal | goals, learning, people, areas, resources | area, priority, target date, progress % | goals progressing |
+| **E** Research | papers, PDFs, web clips, data | one page per paper | papers, thesis, gaps | year, venue, key claim, methodology, supports, contradicts | a thesis page that reflects every paper |
+| **F** Book / Course | chapter notes, highlights, exercises | one page per concept or chapter | characters, themes, timeline, synthesis | status stub→mature, source chapters, first appearance | a synthesis page of the reader's own takeaways |
+
+Differences in plain terms:
+
+- **Time orientation.** C and D look forward (due dates, progress). E and F accumulate. A and B are snapshots refreshed on each crawl or commit.
+- **What the frontmatter is for.** A and B track technical state. C and D track ownership and progress. E tracks evidence, with `supports` and `contradicts`. F tracks where in the material something first appeared.
+
+## Folders every mode keeps
+
+In the generic methodology mode (the default when `.vault-meta/mode.json` is absent), `wiki-ingest`, `autoresearch`, and `save` file into `sources/`, `concepts/`, and `entities/`, and `wiki-query` offers to file answers into `questions/`. Under LYT, PARA, or Zettelkasten the `/wiki-mode` router overrides those paths. If techtrip-secondbrain is installed, its `new-idea` skill also files into `projects/`. **Every mode's scaffold must keep `sources/`, `concepts/`, `entities/`, and `questions/`** with a `_index.md` each, beside the mode's own folders, as the floor for generic and unrouted writes; add `projects/` when techtrip-secondbrain is installed. The mode-specific folder lists below are additions, not replacements.
+
+The "Extra folders" column above omits `concepts/` and `entities/` for every mode because every mode keeps them.
 
 ---
 
@@ -257,3 +285,29 @@ You can combine modes. Examples:
 - "YouTube channel" -> Mode F (content as "book") + Mode E (research on topics covered)
 
 When combining, keep folder names distinct. Don't merge `decisions/` from Mode B and Mode C into one folder.
+
+---
+
+## Custom Modes
+
+When no mode fits, or a mode fits but is missing the output side, define a custom one. A custom mode is nothing more than:
+
+1. A short name, recorded in the vault `CLAUDE.md` `Mode:` line (e.g. `Mode: custom "AI Research and Writing" (Mode E base plus writing/ and projects/)`).
+2. The folder set: the folders every mode keeps (see above), plus the folders borrowed from one or more modes, plus any new ones.
+3. **Filing rules** in the vault `CLAUDE.md`: one numbered rule per folder boundary, stating what goes where and what the threshold is. These rules are what make the mode real; without them ingest and autoresearch fall back to the generic layout.
+4. A Templater template per new note type.
+
+Worked example — a vault for researching AI, writing technical articles about it, and writing AI code:
+
+| Folder | Holds | Rule |
+|--------|-------|------|
+| sources | every ingested raw file (provenance) | default |
+| papers | academic papers only, with Mode E's claim / methodology / supports / contradicts | an arXiv, conference, or lab paper goes here, not to sources |
+| concepts, entities | techniques and patterns; models, labs, tools, people | default |
+| thesis | state-of-the-field synthesis per topic | create once three or more sources cover a topic; rewrite, do not append |
+| gaps | open questions and unresolved contradictions | every unresolved `[!contradiction]` becomes a gap; gaps can serve as the `/autoresearch` queue |
+| writing | article outlines and drafts | drafts cite thesis and concept pages, never raw sources |
+| projects (techtrip-secondbrain only) | `/new-idea` origination projects | graduate article ideas into writing/, code ideas into concepts/ |
+| questions | default | default |
+
+Mode B was considered and rejected for the code side: it maps one codebase, which is not the same as learning to write code. If one repo later becomes central, `modules/` and `flows/` can be added then.

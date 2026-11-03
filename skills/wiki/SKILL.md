@@ -117,16 +117,16 @@ Trigger: user describes what the vault is for.
 
 Steps:
 
-1. Determine the wiki mode. Read `references/modes.md` to show the 6 options and pick the best fit.
-2. Ask: "What is this vault for?" (one question, then proceed).
-3. Create full folder structure under `wiki/` based on the mode.
+1. Read `references/modes.md` and **show the user the "At a glance" table first**, before any question. A one-line label per mode is not enough: users who see only labels pick by name and discover the difference after the first ingest, when switching has become a migration. Say in one sentence that a wiki mode is a folder set plus filing rules, not an Obsidian feature, and distinct from the `/wiki-mode` methodology mode.
+2. Ask: "What is this vault for?" (one question, then proceed). Map the answer to a mode, a combination, or a custom mode per the reference's "Combining Modes" and "Custom Modes" sections. State the pick and why in two sentences before building. If the answer names an output (articles, code, decisions, a product) that the picked mode has no folder for, add that folder now rather than leaving it for later.
+3. Create full folder structure under `wiki/` based on the mode. **Always include** the folders every mode keeps (`sources/`, `concepts/`, `entities/`, `questions/`; plus `projects/` only when techtrip-secondbrain is installed), each with a `_index.md`, beside the mode's own folders. These are where the runtime skills file in generic methodology mode; see the reference's "Folders every mode keeps".
 4. Create domain pages + `_index.md` sub-indexes.
 5. Create `wiki/index.md`, `wiki/log.md`, `wiki/hot.md`, `wiki/overview.md`.
 6. Create `_templates/` files for each note type.
 7. Apply visual customization. Read `references/css-snippets.md`. Create `.obsidian/snippets/vault-colors.css`.
 8. Create the vault CLAUDE.md using the template below.
 9. Initialize git. Read `references/git-setup.md`.
-10. Present the structure and ask: "Want to adjust anything before we start?"
+10. Present the structure and ask: "Want to adjust anything before we start?" If techtrip-secondbrain is installed, mention that `/mode-fit` runs a short conversation to confirm the mode against how they actually plan to use the vault, and that it is cheapest to run now, while the vault is empty.
 
 ### Vault CLAUDE.md Template
 
@@ -135,7 +135,7 @@ Create this file in the vault root when scaffolding a new project vault (not thi
 ```markdown
 # [WIKI NAME]: LLM Wiki
 
-Mode: [MODE A/B/C/D/E/F]
+Mode: [MODE A/B/C/D/E/F, a combination, or custom "<name>" (<base> plus <additions>)]
 Purpose: [ONE SENTENCE]
 Owner: [NAME]
 Created: YYYY-MM-DD
@@ -152,6 +152,10 @@ Created: YYYY-MM-DD
 - wiki/index.md is the master catalog: update on every ingest
 - wiki/log.md is append-only: never edit past entries
 - New log entries go at the TOP of the file
+
+## Filing rules
+
+[ONE NUMBERED RULE PER FOLDER BOUNDARY: what goes where, and the threshold. These are what make the mode real; ingest and autoresearch read them before filing.]
 
 ## Operations
 

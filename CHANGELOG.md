@@ -4,6 +4,22 @@ All notable changes to claude-obsidian. Format: [Keep a Changelog](https://keepa
 
 ## [Unreleased]
 
+### Changed
+- **`/wiki` shows the mode comparison before asking what the vault is for.**
+  `skills/wiki/references/modes.md` gains an "At a glance" table (what each mode is
+  for, atomic unit, extra folders, frontmatter, what "done" looks like) plus a
+  time-orientation note, a paragraph separating wiki modes A-F from the `/wiki-mode`
+  methodology axis, a "Folders every mode keeps" rule (`sources/`, `concepts/`,
+  `entities/`, `questions/` are where the runtime skills file in generic methodology
+  mode, so every scaffold keeps them; `projects/` only when techtrip-secondbrain is
+  installed), and a "Custom Modes" section with a worked AI-research-and-writing
+  example. The
+  SCAFFOLD steps in `skills/wiki/SKILL.md` now present that table first, add an output
+  folder when the user's answer names one, and the vault `CLAUDE.md` template gains a
+  "Filing rules" block. Motivation: a user picked Mode D from one-line labels and only
+  learned the differences after scaffolding; a mode is a convention, not an Obsidian
+  feature, so the choice has to be informed up front.
+
 ## [1.9.7] - 2026-11-03 (deterministic lint)
 
 ### Added
