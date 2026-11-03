@@ -12,6 +12,10 @@ copyright and MIT license apply to the original work and are retained in full; T
 changes are released under the same MIT license. Everything below this section is the
 upstream project's own attribution list, kept as written.
 
+**Vendored from upstream 3.0.1:** the deterministic lint engine under `scripts/claude_obsidian/`
+is copied verbatim from the upstream repository at commit `2e54556` and remains the upstream
+author's work under MIT. File list, commit, and re-sync procedure: [VENDORED.md](VENDORED.md).
+
 ---
 
 claude-obsidian is an original work. The following third-party patterns, tools, and creators informed its design.

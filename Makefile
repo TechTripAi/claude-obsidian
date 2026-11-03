@@ -2,7 +2,7 @@
 # Test runner entry points for DragonScale and vault tooling.
 
 .PHONY: test test-address test-tiling test-boundary test-bm25 test-retrieve \
-        test-lock test-hooks test-concurrent test-mode test-contextual setup-dragonscale \
+        test-lock test-hooks test-concurrent test-mode test-contextual test-lint setup-dragonscale \
         setup-retrieve setup-mode clean-test-state help
 
 help:
@@ -12,6 +12,7 @@ help:
 	@echo "  make test-tiling      scripts/tiling-check.py tests (python, no ollama required)"
 	@echo "  make test-boundary    scripts/boundary-score.py tests (python, no prereqs)"
 	@echo "  make test-bm25        scripts/bm25-index.py tests (python, hermetic)"
+	@echo "  make test-lint        scripts/wiki-lint.py deterministic lint engine tests (python 3.11+, hermetic)"
 	@echo "  make test-retrieve    scripts/retrieve.py + rerank.py tests (python, hermetic)"
 	@echo "  make test-lock        scripts/wiki-lock.sh tests (shell, hermetic)"
 	@echo "  make test-hooks       machine-global hook confinement tests (shell, hermetic)"
@@ -23,7 +24,7 @@ help:
 	@echo "  make setup-mode       Run bin/setup-mode.sh to pick a methodology mode (opt-in v1.8)"
 	@echo "  make clean-test-state Remove runtime lockfiles and tiling/embed caches"
 
-test: test-address test-tiling test-boundary test-bm25 test-retrieve test-lock test-hooks test-concurrent test-mode test-contextual
+test: test-address test-tiling test-boundary test-bm25 test-retrieve test-lock test-hooks test-concurrent test-mode test-contextual test-lint
 	@echo ""
 	@echo "All tests passed."
 
@@ -62,6 +63,10 @@ test-concurrent:
 test-mode:
 	@echo "=== test_wiki_mode.py ==="
 	@python3 tests/test_wiki_mode.py
+
+test-lint:
+	@echo "=== test_lint_engine.py ==="
+	@python3 -m unittest tests.test_lint_engine tests.test_wiki_lint_cli
 
 test-contextual:
 	@echo "=== test_contextual_prefix.py ==="
