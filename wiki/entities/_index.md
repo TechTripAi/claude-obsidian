@@ -1,6 +1,7 @@
 ---
 type: meta
 title: "Entities Index"
+created: 2026-04-07
 updated: 2026-04-07
 tags:
   - meta
@@ -40,4 +41,4 @@ All entity pages — people, organizations, products, and tools.
 
 ---
 
-## Add new entities here as they are identified during ingests.
+<!-- Add new entities here as they are identified during ingests. -->

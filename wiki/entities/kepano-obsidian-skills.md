@@ -59,4 +59,4 @@ Works with Claude Code, Codex CLI, and OpenCode out of the box.
 - [[cherry-picks#1. URL Ingestion in /wiki-ingest]] (pair with defuddle)
 - [[cherry-picks#3. defuddle Web Cleaning Skill]]
 - [[cherry-picks#12. obsidian-bases Skill (from kepano)]]
-- [[cherry-picks#9. Multi-Agent Compatibility]] (format already compatible)
+- [[cherry-picks#9. Multi-Agent Compatibility (Cursor, Windsurf, Codex)]] (format already compatible)

@@ -16,7 +16,6 @@ related:
   - "[[Semantic Topic Clustering]]"
   - "[[Search Experience Optimization]]"
   - "[[SEO Drift Monitoring]]"
-  - "[[E-commerce SEO]]"
 ---
 
 # Claude SEO v1.9.0 — Pro Hub Challenge Integration

@@ -1,6 +1,7 @@
 ---
 type: meta
 title: "Getting Started"
+created: 2026-04-07
 updated: 2026-04-07
 tags:
   - meta
@@ -93,7 +94,7 @@ After 3–5 ingests, the graph starts to look like a real knowledge network. Cro
 - **[[overview]]** — executive summary of vault contents
 - **[[LLM Wiki Pattern]]** — the pattern this vault is built on
 - **[[Wiki vs RAG]]** — why a wiki beats RAG at human scale
-- **[[dashboard]]** — live Dataview queries (requires Dataview plugin)
+- **[[dashboard.md|dashboard]]** — live Dataview queries (requires Dataview plugin)
 
 ---
 

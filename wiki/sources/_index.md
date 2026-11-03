@@ -1,6 +1,7 @@
 ---
 type: meta
 title: "Sources Index"
+created: 2026-04-07
 updated: 2026-04-07
 tags:
   - meta
@@ -39,4 +40,4 @@ All source pages — summaries of ingested documents, transcripts, articles, and
 
 ---
 
-## Add new sources here after each ingest.
+<!-- Add new sources here after each ingest. -->

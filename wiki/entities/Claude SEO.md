@@ -15,7 +15,6 @@ related:
   - "[[Semantic Topic Clustering]]"
   - "[[Search Experience Optimization]]"
   - "[[SEO Drift Monitoring]]"
-  - "[[E-commerce SEO]]"
   - "[[2026-04-15-slides-and-release-session]]"
   - "[[2026-04-15-release-report-session]]"
 ---

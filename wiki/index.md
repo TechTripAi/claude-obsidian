@@ -1,6 +1,7 @@
 ---
 type: meta
 title: "Wiki Index"
+created: 2026-04-07
 updated: 2026-04-07
 tags:
   - meta
@@ -10,7 +11,7 @@ related:
   - "[[overview]]"
   - "[[log]]"
   - "[[hot]]"
-  - "[[dashboard]]"
+  - "[[dashboard.md|dashboard]]"
   - "[[Wiki Map]]"
   - "[[concepts/_index]]"
   - "[[entities/_index]]"
@@ -25,7 +26,7 @@ related:
 
 Last updated: 2026-04-15 | Total pages: 34 | Sources ingested: 2
 
-Navigation: [[overview]] | [[log]] | [[hot]] | [[dashboard]] | [[Wiki Map]] | [[getting-started]]
+Navigation: [[overview]] | [[log]] | [[hot]] | [[dashboard.md|dashboard]] | [[Wiki Map]] | [[getting-started]]
 
 ---
 
@@ -88,6 +89,13 @@ Navigation: [[overview]] | [[log]] | [[hot]] | [[dashboard]] | [[Wiki Map]] | [[
 
 ---
 
+## References
+
+- [[transport-fallback]] — Transport fallback decision tree (Obsidian CLI → MCP → filesystem)
+- [[methodology-modes]] — Methodology modes quick decision tree (LYT / PARA / Zettelkasten / Generic)
+
 ## Domains
+
+None yet. Domain pages are added here after the first domain-scoped ingest.
 
 <!-- Add domain entries here after scaffold -->

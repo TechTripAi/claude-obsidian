@@ -11,14 +11,14 @@ related:
   - "[[index]]"
   - "[[hot]]"
   - "[[log]]"
-  - "[[dashboard]]"
+  - "[[dashboard.md|dashboard]]"
   - "[[LLM Wiki Pattern]]"
 sources:
 ---
 
 # Wiki Overview
 
-Navigation: [[index]] | [[hot]] | [[log]] | [[dashboard]]
+Navigation: [[index]] | [[hot]] | [[log]] | [[dashboard.md|dashboard]]
 
 ---
 
@@ -57,7 +57,6 @@ Run `/wiki` to scaffold this vault for your own domain and replace this overview
 ## Canvases
 
 - [[claude-obsidian-presentation]] — Full presentation: hero, overview, skills, architecture, Wiki vs RAG, visual demos (2026-04-07)
-- [[AI Marketing Hub Cover Images Canvas]] — Cover image library for AI Marketing Hub brand assets
 
 ---
 

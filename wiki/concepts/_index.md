@@ -1,6 +1,7 @@
 ---
 type: meta
 title: "Concepts Index"
+created: 2026-04-07
 updated: 2026-04-07
 tags:
   - meta
@@ -10,7 +11,7 @@ domain: knowledge-management
 status: evergreen
 related:
   - "[[index]]"
-  - "[[dashboard]]"
+  - "[[dashboard.md|dashboard]]"
   - "[[Wiki Map]]"
   - "[[Hot Cache]]"
   - "[[LLM Wiki Pattern]]"
@@ -40,4 +41,4 @@ All concept pages — ideas, patterns, and frameworks extracted from sources.
 
 ---
 
-## Add new concepts here as they are extracted from sources.
+<!-- Add new concepts here as they are extracted from sources. -->
