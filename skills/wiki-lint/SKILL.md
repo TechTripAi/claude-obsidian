@@ -1,10 +1,11 @@
 ---
 name: wiki-lint
 description: >
-  Health check the Obsidian wiki vault. Finds orphan pages, dead wikilinks, stale claims,
-  missing cross-references, frontmatter gaps, empty sections, and orphaned .raw
-  provenance (source pages whose raw file was deleted or moved). Creates or updates
-  Dataview dashboards. Generates canvas maps. Triggers on: "lint", "health check",
+  Health check the Obsidian wiki vault. Runs the deterministic lint engine
+  (scripts/wiki-lint.py: orphans, dead and ambiguous wikilinks, frontmatter gaps, empty
+  sections, stale index entries; same output in every harness), then adds judgment
+  checks (stale claims, missing pages, cross-references) and fork checks (orphaned .raw
+  provenance, staleness aging). Creates or updates Dataview dashboards. Generates canvas maps. Triggers on: "lint", "health check",
   "clean up wiki", "check the wiki", "wiki maintenance", "find orphans", "wiki audit".
 ---
 
@@ -12,35 +13,112 @@ description: >
 
 Run lint after every 10-15 ingests, or weekly. Ask before auto-fixing anything. Output a lint report to `wiki/meta/lint-report-YYYY-MM-DD.md`.
 
+**Lint has three steps, in order:** (1) run the deterministic engine `scripts/wiki-lint.py` and relay its report verbatim; (2) add the judgment checks only a model can do; (3) add the fork's own mechanical checks. Step 1 is the source of truth for everything it covers; never re-derive those findings by hand.
+
+---
+
+## Step 1: Run the deterministic engine (always, first)
+
+Lint is a **script, not a judgment call**. Every harness (Claude Code, Codex, Copilot,
+Cursor, Gemini, ...) runs the same command and relays the same report, so two lint runs
+on the same vault state are byte-identical no matter which model performed them.
+
+Resolve the plugin root, then run the engine against the vault:
+
+```bash
+# VAULT: the directory that contains wiki/ (usually the project root you launched from).
+VAULT="${CLAUDE_OBSIDIAN_VAULT:-$PWD}"
+
+# PLUGIN_ROOT: the directory that contains scripts/wiki-lint.py.
+#   Claude Code      -> $CLAUDE_PLUGIN_ROOT is set; use it.
+#   Codex / Copilot  -> skills/ is symlinked into ~/.codex/skills/claude-obsidian (or similar);
+#                       resolve this SKILL.md's real path and go two directories up.
+#   Cursor / Windsurf / repo checkout -> the repo root (where you ran setup-multi-agent.sh).
+SKILL_MD="$(python3 -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' "<path this skill was loaded from>")"
+PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "$SKILL_MD")/../.." && pwd)}"
+LINT="$PLUGIN_ROOT/scripts/wiki-lint.py"
+test -f "$LINT" || { echo "wiki-lint.py not found under $PLUGIN_ROOT"; exit 2; }
+
+python3 "$LINT" --vault "$VAULT" --format markdown          # human report (default)
+python3 "$LINT" --vault "$VAULT" --format json              # machine-readable
+python3 "$LINT" --vault "$VAULT" --exclude "wiki/scratchpad/*"   # scope a folder out (repeatable)
+python3 "$LINT" --vault "$VAULT" --strict                   # exit 1 when any issue is found
+python3 "$LINT" --vault "$VAULT" --as-of 2026-11-02            # provenance freshness date
+python3 "$LINT" --vault "$VAULT" --frontmatter-policy generated  # opt-in frontmatter value checks
+```
+
+`$VAULT` is the vault root (the directory that contains `wiki/`). The engine also honors
+`CLAUDE_OBSIDIAN_VAULT` and falls back to the current directory. Requires Python 3.11+.
+Exit codes: `0` ok, `1` findings under `--strict`, `2` usage or vault error.
+
+The engine is read-only. It never creates, edits, or deletes anything. It covers,
+deterministically:
+
+| Engine category | What it is |
+|---|---|
+| `dead_links` | Wikilinks, embeds, and Markdown links whose target page, heading, or block does not exist |
+| `ambiguous_targets` | A bare link that resolves to more than one file (reports every candidate) |
+| `duplicate_basenames` | Two pages with the same filename in different folders |
+| `orphans` | Pages with no inbound link from any other page |
+| `missing_frontmatter` | Pages lacking `type`, `status`, `created`, `updated`, or `tags` |
+| `invalid_frontmatter` | Frontmatter that does not parse, or values the vault's policy rejects |
+| `empty_sections` | Headings with no content before the next heading |
+| `stale_index_entries` | `wiki/index.md` entries pointing at renamed or deleted pages |
+| `hidden_target_links` | Links into dot-prefixed paths Obsidian will not index |
+| `unsupported_fragments` | `#heading` or `^block` fragments the parser cannot verify |
+| `provenance_errors` | Malformed or over-capacity source/claim ledgers under `.vault-meta/` |
+| `read_errors` / `configuration_errors` | Unreadable pages; conflicting lint settings |
+
+Details the engine honors: Obsidian aliases, escaped aliases, heading and block fragments,
+code fences and inline code (links inside them are ignored), `.gitignore` files inside the
+vault (a gitignored file never wins an ambiguous resolution), and dot-prefixed directories
+(skipped, mirroring Obsidian's indexer). Allowlist known-dangling links in
+`.vault-meta/lint-allowlist.json` (`{"dangling_links": ["glob", ...]}`) or one glob per
+line in `.vault-meta/lint-allowlist.txt`.
+
+**Paste the engine's Markdown output into the report verbatim.** Do not re-derive, filter,
+re-count, or "tidy" its findings. If you believe the engine is wrong about a finding, say so
+in a note beneath it; do not drop it.
+
+---
+
+## Step 2: Judgment checks (model-dependent, run after the engine)
+
+These need reading comprehension and cannot be made deterministic. Run them **after** Step 1,
+scoped to the pages the engine scanned, and keep them in their own sections so a reader can
+tell engine findings from model findings:
+
+1. **Stale claims**. Assertions on older pages that newer sources have contradicted or updated.
+2. **Missing pages**. Concepts or entities mentioned in multiple pages but lacking their own page.
+3. **Missing cross-references**. Entities mentioned in a page but not linked.
+4. **Writing style**. See the Writing Style Check section below.
+
+---
+
+## Step 3: Fork-owned mechanical checks (not in the engine)
+
+These are deterministic rules this fork added that upstream's engine does not implement.
+Follow the procedures below exactly; they are specifications, not suggestions.
+
+5. **Orphaned provenance**. Source pages whose `.raw/` pointer targets a file that no longer exists, and manifest entries for vanished raw files. See **Provenance Integrity**. (Distinct from the engine's `provenance_errors`, which cover the `.vault-meta/` source and claim ledgers, not `.raw/` pointers.)
+6. **Staleness aging**. Pages whose `updated:` date is older than the threshold. See **Staleness Aging**.
+7. **Address validity** (DragonScale Mechanism 2, opt-in). See **Address Validation**.
+8. **Semantic tiling** (DragonScale Mechanism 3, opt-in). See **Semantic Tiling**. This is a separate Python script and bypasses transport selection.
+
 ---
 
 ## Transport (v1.7+)
 
-Lint primarily reads, then writes a single report file. Both follow the standard transport policy. Read `.vault-meta/transport.json` (auto-created by `bash scripts/detect-transport.sh`):
+Step 1 reads the vault directly from disk through the engine; transport selection does not
+apply to it. For Steps 2 and 3, and for writing the single report file, follow the standard
+transport policy. Read `.vault-meta/transport.json` (auto-created by
+`bash scripts/detect-transport.sh`):
 
-- **cli** — `obsidian-cli read "$VAULT" "$NOTE"` for individual reads; `obsidian-cli backlinks "$VAULT" "$NOTE"` natively handles backlink graph (avoids re-rolling it via Grep); see [`skills/wiki-cli/SKILL.md`](../wiki-cli/SKILL.md)
+- **cli** — `obsidian-cli read "$VAULT" "$NOTE"` for individual reads; see [`skills/wiki-cli/SKILL.md`](../wiki-cli/SKILL.md)
 - **mcp-obsidian** / **mcpvault** — `mcp__obsidian-vault__read_multiple_notes`, `list_all_tags`
-- **filesystem** — Claude's `Read`/`Glob`/`Grep` (final floor; current v1.6 behavior)
+- **filesystem** — Claude's `Read`/`Glob`/`Grep` (final floor)
 
-Full decision tree: [`wiki/references/transport-fallback.md`](../../wiki/references/transport-fallback.md). DragonScale Mechanism 3 tiling lint is a separate code path (Python script) and bypasses transport selection.
-
----
-
-## Lint Checks
-
-Work through these in order:
-
-1. **Orphan pages**. Wiki pages with no inbound wikilinks. They exist but nothing points to them.
-2. **Dead links**. Wikilinks that reference a page that does not exist.
-3. **Stale claims**. Assertions on older pages that newer sources have contradicted or updated. Also surface **age-based staleness**: pages whose `updated:` date is older than the staleness threshold. See the **Staleness Aging** section below.
-4. **Missing pages**. Concepts or entities mentioned in multiple pages but lacking their own page.
-5. **Missing cross-references**. Entities mentioned in a page but not linked.
-6. **Frontmatter gaps**. Pages missing required fields (type, status, created, updated, tags).
-7. **Empty sections**. Headings with no content underneath.
-8. **Stale index entries**. Items in `wiki/index.md` pointing to renamed or deleted pages.
-9. **Orphaned provenance**. Source pages whose `.raw/` provenance pointer targets a file that no longer exists, and manifest entries for vanished raw files. See the **Provenance Integrity** section below.
-10. **Address validity** (DragonScale Mechanism 2). For every page that has an `address:` frontmatter field, validate the format. See the **Address Validation** section below.
-11. **Semantic tiling** (DragonScale Mechanism 3, opt-in). Flag candidate duplicate pages (across all scanned types, not just concepts) via embedding cosine similarity. See the **Semantic Tiling** section below.
+Full decision tree: [`wiki/references/transport-fallback.md`](../../wiki/references/transport-fallback.md).
 
 ---
 
@@ -60,39 +138,39 @@ status: developing
 
 # Lint Report: YYYY-MM-DD
 
-## Summary
-- Pages scanned: N
-- Issues found: N
-- Auto-fixed: N
-- Needs review: N
+## Engine Report (deterministic)
+Command: `python3 scripts/wiki-lint.py --vault <vault> --format markdown`
 
-## Orphan Pages
-- [[Page Name]]: no inbound links. Suggest: link from [[Related Page]] or delete.
+<engine Markdown output, pasted verbatim, with its own headings unchanged>
 
-## Dead Links
-- [[Missing Page]]: referenced in [[Source Page]] but does not exist. Suggest: create stub or remove link.
+## Judgment Findings (model-dependent)
 
-## Missing Pages
+### Missing Pages
 - "concept name": mentioned in [[Page A]], [[Page B]], [[Page C]]. Suggest: create a concept page.
 
-## Frontmatter Gaps
-- [[Page Name]]: missing fields: status, tags
-
-## Stale Claims
+### Stale Claims
 - [[Page Name]]: claim "X" may conflict with newer source [[Newer Source]].
 
-## Aging Pages
+### Cross-Reference Gaps
+- [[Entity Name]] mentioned in [[Page A]] without a wikilink.
+
+## Fork Checks (mechanical)
+
+### Aging Pages
 Threshold: 90 days. Evergreen pages exempt.
 - **seed** (2): [[Page A]] (updated 2026-01-03), [[Page B]] (updated 2026-02-11)
 - **developing** (1): [[Page C]] (updated 2026-03-20)
 - **mature** (0): —
 
-## Cross-Reference Gaps
-- [[Entity Name]] mentioned in [[Page A]] without a wikilink.
-
-## Orphaned Provenance
+### Orphaned Provenance
 - [[Source Page]]: `raw_file:` points to `.raw/articles/foo.md`, which does not exist. Suggest: restore the file, update the path (was it archived?), or acknowledge the provenance loss.
 - `.raw/.manifest.json`: entry for `.raw/videos/bar.vtt` but the file is gone.
+
+### Address Validation
+(only when DragonScale addresses are enabled; see below)
+
+### Semantic Tiling
+(only when tiling is enabled; see below)
 ```
 
 ---
@@ -206,7 +284,7 @@ Posture:
 
 ## Staleness Aging
 
-The stale-claims check (#3) relies on judgment — noticing that a newer source contradicts an older page. This companion signal is mechanical: **a page nobody has touched in a long time may be quietly rotting**, whether or not anything contradicts it yet. **Report-only.**
+The stale-claims judgment check (Step 2, item 1) relies on judgment — noticing that a newer source contradicts an older page. This companion signal is mechanical: **a page nobody has touched in a long time may be quietly rotting**, whether or not anything contradicts it yet. **Report-only.**
 
 - **Threshold**: 90 days by default. If `.vault-meta/lint-thresholds.json` exists and has a `staleness_days` key, use that instead. The user can also override it for a single run ("lint with staleness at 30 days").
 - **Scope**: every page with an `updated:` frontmatter date, EXCEPT:
@@ -432,7 +510,7 @@ When working on this skill, apply the 10-principle loop. See [`skills/think/SKIL
 
 | # | Principle | Application here |
 |---|-----------|-------------------|
-| 1 | OBSERVE (ext) | Scan every page, every wikilink, every frontmatter block. No skipping for size or apparent obviousness. |
+| 1 | OBSERVE (ext) | Run the engine first; it scans every page, link, and frontmatter block without sampling. Judgment checks then cover what it cannot. |
 | 2 | OBSERVE (int) | Am I biased toward "looks fine"? Pretend you're a hostile reader looking for what's actually wrong. |
 | 3 | LISTEN | Did the user mention specific concerns this session? Prioritize those over generic checks. |
 | 4 | THINK | Which checks matter? Tier findings by severity (BLOCKER / HIGH / MEDIUM / LOW), not by ease of fix. |
