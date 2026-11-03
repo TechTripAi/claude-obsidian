@@ -4,6 +4,8 @@ All notable changes to claude-obsidian. Format: [Keep a Changelog](https://keepa
 
 ## [Unreleased]
 
+## [1.9.8] - 2026-11-03 (informed mode selection)
+
 ### Changed
 - **`/wiki` shows the mode comparison before asking what the vault is for.**
   `skills/wiki/references/modes.md` gains an "At a glance" table (what each mode is
