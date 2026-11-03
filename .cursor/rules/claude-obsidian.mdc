@@ -25,7 +25,7 @@ A Claude Code plugin and Obsidian vault that builds persistent, compounding know
 | `wiki` | Scaffold new vault, route to sub-skills |
 | `wiki-ingest` | Ingest a file, URL, or image: creates 8-15 wiki pages |
 | `wiki-query` | Answer questions from the wiki (Quick / Standard / Deep modes) |
-| `wiki-lint` | Health check: orphans, dead links, gaps |
+| `wiki-lint` | Health check: run `scripts/wiki-lint.py --vault <vault>` first (deterministic), then judgment checks |
 | `save` | File current conversation as a wiki note |
 | `autoresearch` | Autonomous research loop |
 | `canvas` | Create/edit Obsidian canvas files |

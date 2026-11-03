@@ -91,7 +91,7 @@ You drop sources. Claude reads them, extracts entities and concepts, updates cro
 
 You ask questions. Claude reads the hot cache (recent context), scans the index, drills into relevant pages, and synthesizes an answer. It cites specific wiki pages, not training data.
 
-You lint. Claude finds orphans, dead links, stale claims, and missing cross-references. Your wiki stays healthy without manual cleanup.
+You lint. A deterministic engine finds orphans, dead links, frontmatter gaps, and stale index entries, identically in every harness; Claude adds stale claims and missing cross-references on top. Your wiki stays healthy without manual cleanup.
 
 At the end of every session, Claude updates a hot cache. The next session starts with full recent context, no recap needed.
 
@@ -111,7 +111,7 @@ Most Obsidian AI plugins are chat interfaces. They answer questions about your e
 | **Auto-organize notes** | ✅ Creates entities, concepts, cross-references | ❌ | ❌ |
 | **Contradiction flagging** | ✅ `[!contradiction]` callouts with sources | ❌ | ❌ |
 | **Session memory** | ✅ Hot cache persists between conversations | ❌ | ❌ |
-| **Vault maintenance** | ✅ 8-category lint (orphans, dead links, gaps) | ❌ | ❌ |
+| **Vault maintenance** | ✅ Deterministic 13-category lint engine + judgment checks | ❌ | ❌ |
 | **Autonomous research** | ✅ 3-round web research with gap-filling | ❌ | ❌ |
 | **Methodology modes** | ✅ LYT / PARA / Zettelkasten / Generic (first-class) | ❌ | ❌ |
 | **Thinking framework** | ✅ 10-principle loop as invocable skill | ❌ | ❌ |
@@ -224,7 +224,7 @@ Then scaffold the full wiki structure.
 | `/canvas zone [name]` | Add a new labeled zone to organize visual content |
 | `/canvas from banana` | Capture recently generated images onto the canvas |
 | `/think [problem]` | Apply the 10-principle thinking loop to a non-trivial problem |
-| `lint the wiki` | Health check: orphans, dead links, gaps, suggestions |
+| `lint the wiki` | Health check: deterministic engine (orphans, dead links, gaps) + judgment suggestions |
 | `update hot cache` | Refresh hot.md with latest context summary |
 
 > ✨ **Want more?** [claude-canvas](https://github.com/AgriciDaniel/claude-canvas) adds 12 templates, 6 layout algorithms, AI image generation, presentations, and full canvas orchestration. Install both, they complement each other.
@@ -637,7 +637,7 @@ An optional opt-in extension (`bash bin/setup-dragonscale.sh`) that adds four me
 |-----------|---------|-------|
 | Claude Code | latest | https://claude.com/claude-code |
 | Obsidian | v1.9.10+ (for Bases) | https://obsidian.md. v1.6+ works with Dataview fallback. |
-| Python | 3.10+ | For the optional retrieval pipeline and the test suite |
+| Python | 3.11+ | For `wiki-lint`, the optional retrieval pipeline, and the test suite |
 | Bash | 4.0+ (or zsh) | For setup scripts |
 | Git | any | For vault auto-commits via the Obsidian Git plugin |
 

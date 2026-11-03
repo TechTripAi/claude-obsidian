@@ -23,7 +23,7 @@ bash bin/setup-multi-agent.sh
 | `wiki` | Scaffolds a new vault, manages hot cache, routes to sub-skills |
 | `wiki-ingest` | Reads sources (files, URLs, images) and creates 8-15 wiki pages each |
 | `wiki-query` | Answers questions from the wiki with three depth modes |
-| `wiki-lint` | Health checks: orphans, dead links, stale claims, gaps |
+| `wiki-lint` | Health checks. Runs `scripts/wiki-lint.py` (deterministic: orphans, dead links, frontmatter gaps) first, then stale claims and cross-reference judgment |
 | `save` | Files the current conversation as a wiki note |
 | `autoresearch` | Autonomous research loop: search → fetch → synthesize → file |
 | `canvas` | Creates and edits Obsidian canvas (.canvas) files |

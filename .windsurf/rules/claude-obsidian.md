@@ -32,7 +32,7 @@ Run `bash bin/setup-multi-agent.sh` once to symlink `skills/` into `.windsurf/sk
 - `wiki`: orchestration, vault scaffolding, hot cache
 - `wiki-ingest`: files, URLs, images → 8-15 wiki pages
 - `wiki-query`: Quick / Standard / Deep query modes
-- `wiki-lint`: health check (orphans, dead links, gaps)
+- `wiki-lint`: health check; run `scripts/wiki-lint.py --vault <vault>` first (deterministic), then judgment checks
 - `save`: file conversation as wiki note
 - `autoresearch`: autonomous research loop
 - `canvas`: Obsidian canvas (.canvas) files

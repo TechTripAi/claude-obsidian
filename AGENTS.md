@@ -29,7 +29,7 @@ bash bin/setup-multi-agent.sh
 | `wiki` | `/wiki`, set up wiki, scaffold vault |
 | `wiki-ingest` | ingest, ingest this url, ingest this image, batch ingest |
 | `wiki-query` | query, what do you know about, query quick:, query deep: |
-| `wiki-lint` | lint the wiki, health check, find orphans |
+| `wiki-lint` | lint the wiki, health check, find orphans. Step 1 is deterministic: `python3 <plugin-root>/scripts/wiki-lint.py --vault <vault> --format markdown` (Python 3.11+); relay its output verbatim, then add judgment checks |
 | `wiki-fold` | fold the log, run a fold, log rollup (DragonScale Mechanism 1, opt-in) |
 | `save` | /save, file this conversation |
 | `autoresearch` | autoresearch, autonomous research loop |

@@ -27,7 +27,7 @@ Ask any question. Claude reads the index first, then drills into relevant pages.
 
 Run `/wiki` to scaffold a new vault or check setup status.
 
-Run "lint the wiki" every 10-15 ingests to catch orphans and gaps.
+Run "lint the wiki" every 10-15 ingests to catch orphans and gaps. Lint's first step is deterministic: `python3 scripts/wiki-lint.py --vault <vault>` (same output in every harness); the skill relays it verbatim, then adds judgment checks.
 
 ## Cross-Project Access
 
@@ -53,7 +53,7 @@ Do NOT read the wiki for general coding questions or things already in this proj
 | `/wiki` | Setup, scaffold, route to sub-skills |
 | `ingest [source]` | Single or batch source ingestion |
 | `query: [question]` | Answer from wiki content |
-| `lint the wiki` | Health check |
+| `lint the wiki` | Health check (deterministic engine first, then judgment) |
 | `/save` | File the current conversation as a structured wiki note |
 | `/autoresearch [topic]` | Autonomous research loop: search, fetch, synthesize, file |
 | `/canvas` | Visual layer: add images, PDFs, notes to Obsidian canvas |

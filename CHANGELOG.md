@@ -4,7 +4,37 @@ All notable changes to claude-obsidian. Format: [Keep a Changelog](https://keepa
 
 ## [Unreleased]
 
+## [1.9.7] - 2026-11-03 (deterministic lint)
+
+### Added
+- **Deterministic lint engine, identical in every harness.** `scripts/wiki-lint.py`
+  wraps the lint engine vendored from upstream claude-obsidian 3.0.1 plus its
+  docs-only follow-up merges (commit `2e54556`, MIT, Daniel Agrici) into
+  `scripts/claude_obsidian/`. The twelve engine modules are byte-identical to
+  upstream; only the copied test file carries three path edits. It is
+  stdlib-only, read-only, and byte-identical across runs, so Claude Code, Codex,
+  Copilot, Cursor, and Gemini all produce the same findings from the same command:
+  dead and ambiguous wikilinks (aliases, heading and block fragments, code fences
+  respected), orphans, duplicate basenames, missing or invalid frontmatter, empty
+  sections, stale `index.md` entries, hidden-path links, and ledger provenance errors.
+  Flags: `--vault`, `--format json|markdown`, `--exclude GLOB` (repeatable), `--as-of`,
+  `--frontmatter-policy presence|generated`, `--strict`. Exit 0 ok, 1 findings under `--strict`, 2 usage/vault error. Requires
+  Python 3.11+. Provenance and re-sync procedure: `VENDORED.md`.
+- `make test-lint`: upstream's 120-test engine suite plus wrapper tests, wired into
+  `make test`.
+
 ### Changed
+- **`wiki-lint` skill and agent run the engine first.** Step 1 is the script, relayed
+  verbatim; step 2 is the judgment checks only a model can do (stale claims, missing
+  pages, cross-references); step 3 is the fork's own mechanical checks (orphaned `.raw`
+  provenance, staleness aging, DragonScale address validation, semantic tiling). The
+  prose that previously told the model to find orphans and dead links by hand is gone.
+- Python floor for the test suite and lint is 3.11 (was 3.10), matching upstream's
+  floor for the engine; the wrapper enforces it.
+
+- Hooks, auto-commit, advisory locks, transport, and every other 1.9.x behavior are
+  untouched. Only the lint engine was taken from upstream 3.x; see `VENDORED.md` for
+  the boundary.
 - **Fork posture: maintained independently.** Upstream does not take this fork's
   changes, so the fork is now a standing, independently maintained build rather than a
   patch set tracking upstream. README gains a fork notice at the top and a catalog

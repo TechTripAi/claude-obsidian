@@ -121,7 +121,7 @@ Claude reads the hot cache, scans the index, drills into relevant pages, and giv
 | `/canvas add text [content]` | Add a markdown text card |
 | `/canvas add pdf [path]` | Add a PDF document |
 | `/canvas add note [page]` | Pin a wiki page as a linked card |
-| `lint the wiki` | Health check: orphans, dead links, gaps |
+| `lint the wiki` | Health check: deterministic engine (orphans, dead links, gaps) + judgment suggestions |
 | `update hot cache` | Refresh `hot.md` with latest context summary |
 
 ---
